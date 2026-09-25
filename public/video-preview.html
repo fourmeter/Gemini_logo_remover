@@ -107,6 +107,8 @@
     }
     .topbar-in { height: 72px; display: flex; align-items: center; gap: 24px; }
     .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+    .brand-logo { transition: filter 0.2s; }
+    :root[data-theme="dark"] .brand-logo { filter: invert(1) brightness(1.2); }
     .brand-mark {
       width: 32px; height: 32px; border-radius: 10px;
       color: #fff;
