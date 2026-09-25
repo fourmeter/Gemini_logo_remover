@@ -306,16 +306,7 @@ const userscriptWorkerBuild = await esbuild.build({
 });
 const userscriptWorkerCode = userscriptWorkerBuild.outputFiles?.[0]?.text || '';
 
-const userscriptPageProcessorBuild = await esbuild.build({
-  ...commonConfig,
-  entryPoints: ['src/page/pageProcessorBootstrap.js'],
-  format: 'iife',
-  platform: 'browser',
-  target: ['es2020'],
-  write: false,
-  sourcemap: false,
-});
-const userscriptPageProcessorCode = userscriptPageProcessorBuild.outputFiles?.[0]?.text || '';
+
 
 // Build userscript
 const userscriptCtx = await esbuild.context({
