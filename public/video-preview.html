@@ -554,6 +554,40 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; }
 .do-inner { border: 1.5px dashed var(--line2); border-radius: 14px; }
 .brand { font-family: 'Space Grotesk', sans-serif; font-weight: 600; }
 
+
+
+/* ---------- hero animations ---------- */
+.eyebrow{display:inline-flex;align-items:center;gap:11px;font:500 10.5px "IBM Plex Mono";letter-spacing:.2em;color:var(--muted);text-transform:uppercase;opacity:0;animation:fadeUp .7s .05s cubic-bezier(.16,1,.3,1) forwards;margin:0 auto;}
+.pulse{width:7px;height:7px;border-radius:50%;background:var(--mint);position:relative}
+.pulse::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:1px solid var(--mint);animation:pl 2.2s ease-out infinite}
+@keyframes pl{0%{transform:scale(.45);opacity:.9}100%{transform:scale(1.7);opacity:0}}
+.h1 .l{display:block;overflow:hidden;padding-bottom:.09em;margin-bottom:-.09em}
+.h1 .w{display:inline-block;transform:translateY(118%);animation:rise .85s cubic-bezier(.16,1,.3,1) forwards}
+.h1 .l:nth-child(1) .w{animation-delay:.08s}
+.h1 .l:nth-child(2) .w{animation-delay:.18s}
+.h1 .l:nth-child(3) .w{animation-delay:.28s}
+@keyframes rise{to{transform:translateY(0)}}
+.ghost-wrap{position:relative;display:inline-block}
+.ghost{font-style:normal;color:var(--dim)}
+@supports (-webkit-text-stroke:1px #000){.ghost{color:transparent;-webkit-text-stroke:1.5px rgba(238,240,246,.55)}}
+:root[data-theme="light"] .ghost { -webkit-text-stroke: 1.5px rgba(10,11,15, 0.45); }
+.strike{position:absolute;left:-1.5%;top:52%;width:0;height:.075em;background:var(--blue);border-radius:3px;transform:rotate(-1.4deg);animation:strike .5s .95s cubic-bezier(.7,0,.3,1) forwards}
+@keyframes strike{to{width:103%}}
+.ghost{animation:ghostFade .6s 1.5s forwards}
+@keyframes ghostFade{to{opacity:.28}}
+.mint{color:var(--mint)}
+.meta-strip{margin-top:44px;padding-top:15px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;justify-content:center;gap:8px 0;font:500 10.5px "IBM Plex Mono";letter-spacing:.14em;color:var(--dim);text-transform:uppercase;opacity:0;animation:fadeUp .7s .74s cubic-bezier(.16,1,.3,1) forwards}
+.meta-strip span:not(:last-child)::after{content:'/';margin:0 13px;color:var(--line2)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* ---------- new slider handle ---------- */
+.cmp-handle{position:absolute;top:0;bottom:0;left:50%;width:0;outline:none;z-index:20;}
+.cmp-handle .bar{position:absolute;top:0;bottom:0;left:-1px;width:2px;background:var(--text); opacity:0.95;}
+.cmp-handle .knob{position:absolute;top:50%;left:0;transform:translate(-50%,-50%);width:37px;height:37px;border-radius:50%;background:var(--bg);border:1.5px solid var(--text);display:flex;align-items:center;justify-content:center;color:var(--text);box-shadow:0 8px 22px rgba(0,0,0,.55);transition:scale .15s}
+.cmp-handle:active .knob{scale:1.08}
+.cmp-handle:focus-visible .knob{outline:2px solid var(--blue);outline-offset:2px}
+.knob .ic{width:16px;height:16px}
+
 </style>
 </head>
 <body>
