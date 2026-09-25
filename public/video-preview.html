@@ -596,37 +596,477 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; }
 .meta-strip span:not(:last-child)::after{content:'/';margin:0 13px;color:var(--line2)}
 @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 
-/* ---------- new slider handle ---------- */
-.cmp-handle{position:absolute;top:0;bottom:0;left:50%;width:0;outline:none;z-index:20;}
-.cmp-handle .bar{position:absolute;top:0;bottom:0;left:-1px;width:2px;background:var(--text); opacity:0.95;}
-.cmp-handle .knob{position:absolute;top:50%;left:0;transform:translate(-50%,-50%);width:37px;height:37px;border-radius:50%;background:var(--bg);border:1.5px solid var(--text);display:flex;align-items:center;justify-content:center;color:var(--text);box-shadow:0 8px 22px rgba(0,0,0,.55);transition:scale .15s}
-.cmp-handle:active .knob{scale:1.08}
-.cmp-handle:focus-visible .knob{outline:2px solid var(--blue);outline-offset:2px}
-.knob .ic{width:16px;height:16px}
-
-
-
 .drop .do-inner { border: 1.5px dashed var(--line2); border-radius: 14px; padding: 52px 68px; text-align: center; transition: background 0.2s, border-color 0.2s; cursor: pointer; }
 .drop .do-inner:hover { background: rgba(255,255,255,0.02); border-color: var(--blue); }
 .drop.dragover .do-inner { background: rgba(110,155,255,0.1); border-color: var(--blue); }
 .drop .do-inner .ic { width: 30px; height: 30px; color: var(--blue); }
 
-
-
-/* ---------- enhanced ba-stage empty states & badges ---------- */
-
-
-
-
-#originalEmpty {
-  position: absolute; left: 0; width: var(--pos, 50%); height: 100%;
-  display: flex; align-items: center; justify-content: center; text-align: center;
-  background: var(--panel); font-family: 'Space Grotesk', sans-serif; font-size: 16px; color: var(--dim);
+/* =========================================================
+   ENHANCED COMPARISON STUDIO & SLIDER
+   ========================================================= */
+.ba-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
 }
-#processedEmpty {
-  position: absolute; left: var(--pos, 50%); width: calc(100% - var(--pos, 50%)); height: 100%;
-  display: flex; align-items: center; justify-content: center; text-align: center;
-  background: var(--panel); font-family: 'Space Grotesk', sans-serif; font-size: 16px; color: var(--dim);
+.ba-head-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.ba-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font: 600 10.5px 'IBM Plex Mono', monospace;
+  letter-spacing: .16em;
+  color: var(--dim);
+  text-transform: uppercase;
+}
+.ba-step-num {
+  color: var(--blue);
+  font-weight: 700;
+}
+.ba-sep {
+  color: var(--line2);
+}
+.ba-title {
+  margin: 0;
+  font-size: 17.5px;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.ba-title .ic {
+  width: 18px;
+  height: 18px;
+  color: var(--blue);
+}
+.ba-arrow {
+  color: var(--dim);
+  font-size: 14px;
+  margin: 0 2px;
+}
+.clean-text {
+  color: var(--mint);
+}
+
+.ba-head-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: auto;
+  flex-wrap: wrap;
+}
+
+/* Preset switcher pills */
+.ba-presets {
+  display: inline-flex;
+  align-items: center;
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 3px;
+  gap: 2px;
+}
+.ba-preset-btn, .ba-peek-btn {
+  appearance: none;
+  background: transparent;
+  border: none;
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all .18s cubic-bezier(0.16, 1, 0.3, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  user-select: none;
+}
+.ba-preset-btn:hover, .ba-peek-btn:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.06);
+}
+:root[data-theme="light"] .ba-preset-btn:hover, :root[data-theme="light"] .ba-peek-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+.ba-preset-btn.active {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+:root[data-theme="dark"] .ba-preset-btn.active {
+  background: var(--blue);
+  color: #fff;
+  box-shadow: 0 2px 10px rgba(110, 155, 255, 0.3);
+}
+.ba-peek-btn {
+  border-left: 1px solid var(--line2);
+  border-radius: 0 999px 999px 0;
+  margin-left: 2px;
+  padding-left: 9px;
+}
+.ba-peek-btn .ic {
+  width: 13px;
+  height: 13px;
+}
+.ba-peek-btn:active, .ba-peek-btn.is-peeking {
+  background: var(--amber);
+  color: #000;
+  font-weight: 700;
+}
+
+/* Enhanced Drag Hint pill */
+.ba-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font: 500 11px 'IBM Plex Mono', monospace;
+  letter-spacing: 0.08em;
+  color: var(--text);
+  text-transform: uppercase;
+  background: var(--panel2);
+  padding: 4px 10px 4px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  backdrop-filter: blur(8px);
+  transition: border-color .2s, box-shadow .2s;
+}
+.ba-hint:hover {
+  border-color: var(--blue);
+}
+.drag-icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(37, 99, 235, 0.12);
+  color: var(--blue);
+}
+:root[data-theme="dark"] .drag-icon-wrap {
+  background: rgba(110, 155, 255, 0.18);
+  color: var(--blue);
+}
+.ba-pos-badge {
+  font-weight: 700;
+  font-size: 10px;
+  color: var(--blue);
+  background: rgba(37, 99, 235, 0.08);
+  padding: 2px 6px;
+  border-radius: 6px;
+  min-width: 32px;
+  text-align: center;
+}
+:root[data-theme="dark"] .ba-pos-badge {
+  background: rgba(110, 155, 255, 0.18);
+}
+
+/* Stage */
+.ba-stage {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: #0B0D14;
+  cursor: ew-resize;
+  touch-action: none;
+  overflow: hidden;
+  --pos: 50%;
+  user-select: none;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+.ba-stage.is-animating,
+.ba-stage.is-animating .ba-before,
+.ba-stage.is-animating .cmp-handle {
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Viewfinder corner brackets */
+.ba-viewfinder {
+  position: absolute;
+  inset: 12px;
+  pointer-events: none;
+  z-index: 10;
+  opacity: 0.45;
+  transition: opacity .25s;
+}
+.ba-stage:hover .ba-viewfinder {
+  opacity: 0.8;
+}
+.vf-corner {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-color: rgba(255, 255, 255, 0.45);
+  border-style: solid;
+  pointer-events: none;
+}
+.vf-tl { top: 0; left: 0; border-width: 1.5px 0 0 1.5px; }
+.vf-tr { top: 0; right: 0; border-width: 1.5px 1.5px 0 0; }
+.vf-bl { bottom: 0; left: 0; border-width: 0 0 1.5px 1.5px; }
+.vf-br { bottom: 0; right: 0; border-width: 0 1.5px 1.5px 0; }
+
+/* Layers */
+.ba-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+.ba-layer .frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  background: #000;
+}
+.ba-after {
+  z-index: 1;
+}
+.ba-before {
+  z-index: 2;
+  clip-path: inset(0 calc(100% - var(--pos, 50%)) 0 0);
+}
+
+/* Badges */
+.ba-badge {
+  position: absolute;
+  top: 18px;
+  z-index: 15;
+  appearance: none;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(14, 16, 24, 0.72);
+  color: #fff;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border-radius: 999px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s, border-color 0.2s, opacity 0.2s;
+}
+.ba-badge:hover {
+  transform: scale(1.05);
+  background: rgba(20, 24, 38, 0.88);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+.badge-before { left: 18px; }
+.badge-after { right: 18px; }
+
+.badge-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.dot-before {
+  background: #F59E0B;
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
+}
+.dot-after {
+  background: #10B981;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+}
+
+/* Empty states */
+.empty-state {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  z-index: 3;
+  pointer-events: none;
+}
+.empty-state[hidden] {
+  display: none !important;
+}
+.empty-before {
+  background: radial-gradient(circle at center, rgba(37, 99, 235, 0.10) 0%, rgba(11, 13, 20, 0.96) 100%);
+}
+.empty-after {
+  background: radial-gradient(circle at center, rgba(16, 185, 129, 0.10) 0%, rgba(11, 13, 20, 0.96) 100%);
+}
+.empty-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 24px;
+  max-width: 280px;
+}
+.empty-icon-wrap {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+.blue-glow {
+  background: rgba(37, 99, 235, 0.15);
+  color: #6E9BFF;
+  box-shadow: 0 0 24px rgba(37, 99, 235, 0.25);
+}
+.mint-glow {
+  background: rgba(16, 185, 129, 0.15);
+  color: #3FDC9E;
+  box-shadow: 0 0 24px rgba(16, 185, 129, 0.25);
+}
+.empty-svg {
+  width: 24px;
+  height: 24px;
+}
+.empty-title {
+  margin: 0 0 4px;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: #EEF0F6;
+}
+.empty-desc {
+  margin: 0;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.4;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+/* Comparison Handle & Knob */
+.cmp-handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--pos, 50%);
+  width: 0;
+  outline: none;
+  z-index: 25;
+  cursor: ew-resize;
+}
+.cmp-handle .bar {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -1px;
+  width: 2px;
+  background: #FFFFFF;
+  pointer-events: none;
+  box-shadow: 0 0 10px rgba(110, 155, 255, 0.8), 0 0 20px rgba(37, 99, 235, 0.4);
+}
+.bar-cap {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 3px;
+  background: #FFFFFF;
+  border-radius: 2px;
+  box-shadow: 0 0 8px rgba(110, 155, 255, 0.9);
+}
+.bar-cap.top { top: 0; }
+.bar-cap.bottom { bottom: 0; }
+
+.cmp-handle .knob {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translate(-50%, -50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(18, 20, 28, 0.92);
+  border: 2px solid #FFFFFF;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.3), 0 8px 24px rgba(0, 0, 0, 0.6);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s, background 0.2s;
+  cursor: grab;
+}
+.cmp-handle:hover .knob {
+  transform: translate(-50%, -50%) scale(1.08);
+  box-shadow: 0 0 0 6px rgba(110, 155, 255, 0.4), 0 10px 28px rgba(0, 0, 0, 0.7);
+}
+.cmp-handle:active .knob, .ba-stage.is-dragging .knob {
+  cursor: grabbing;
+  transform: translate(-50%, -50%) scale(1.14);
+  background: var(--blue);
+  border-color: #FFFFFF;
+  box-shadow: 0 0 0 8px rgba(110, 155, 255, 0.5), 0 12px 32px rgba(0, 0, 0, 0.8);
+}
+.cmp-handle:focus-visible .knob {
+  outline: 2px solid var(--blue);
+  outline-offset: 3px;
+}
+.knob-arrows {
+  width: 20px;
+  height: 20px;
+  color: #FFFFFF;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5));
+}
+
+/* Floating percentage tooltip above knob */
+.knob-bubble {
+  position: absolute;
+  top: -34px;
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  background: rgba(14, 16, 24, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s, transform 0.15s;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+.knob-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid rgba(14, 16, 24, 0.9);
+}
+.cmp-handle:hover .knob-bubble,
+.cmp-handle:active .knob-bubble,
+.ba-stage.is-dragging .knob-bubble {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
 }
 
 </style>
@@ -811,31 +1251,104 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; }
       <!-- CENTER CONTENT -->
       <main class="col-center">
         <article class="card" id="compareCard">
-          <div class="card-head">
-            <h2 class="card-title"><svg class="ic" aria-hidden="true"><use href="#i-film"/></svg>Before / After</h2>
-            <span class="hint">
-  <svg class="ic-drag-anim" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <path class="arrow-l" d="m10 8-4 4 4 4"/><path class="arrow-r" d="m14 8 4 4-4 4"/>
-    <line x1="12" y1="4" x2="12" y2="20" stroke-opacity="0.3"/>
-  </svg>
-  Drag to compare
-</span>
+          <div class="card-head ba-card-head">
+            <div class="ba-head-left">
+              <div class="ba-eyebrow">
+                <span class="ba-step-num">02</span>
+                <span class="ba-sep">/</span>
+                <span>Comparison Studio</span>
+              </div>
+              <h2 class="card-title ba-title">
+                <svg class="ic" aria-hidden="true"><use href="#i-film"/></svg>
+                <span>Before <span class="ba-arrow">→</span> <span class="clean-text">Clean</span></span>
+              </h2>
+            </div>
+            <div class="ba-head-controls">
+              <!-- Quick Preset Switcher -->
+              <div class="ba-presets" role="group" aria-label="Comparison split presets">
+                <button type="button" class="ba-preset-btn" data-pos="98" id="presetBefore" title="Show 100% Original">Before</button>
+                <button type="button" class="ba-preset-btn active" data-pos="50" id="presetSplit" title="50/50 Split View">Split 50%</button>
+                <button type="button" class="ba-preset-btn" data-pos="2" id="presetAfter" title="Show 100% Cleaned">After</button>
+                <button type="button" class="ba-peek-btn" id="peekBtn" title="Hold to quickly inspect original">
+                  <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                  <span>Peek</span>
+                </button>
+              </div>
+              <!-- Enhanced Drag to Compare Pill -->
+              <div class="hint ba-hint" id="baHintPill" title="Drag slider or click anywhere on canvas">
+                <span class="drag-icon-wrap">
+                  <svg class="ic-drag-anim" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path class="arrow-l" d="m10 8-4 4 4 4"/>
+                    <path class="arrow-r" d="m14 8 4 4-4 4"/>
+                    <line x1="12" y1="4" x2="12" y2="20" stroke-opacity="0.3"/>
+                  </svg>
+                </span>
+                <span>Drag to compare</span>
+                <span class="ba-pos-badge" id="baPosBadge">50%</span>
+              </div>
+            </div>
           </div>
           <div class="ba-stage" id="baStage">
+            <!-- Viewfinder corners -->
+            <div class="ba-viewfinder" aria-hidden="true">
+              <span class="vf-corner vf-tl"></span>
+              <span class="vf-corner vf-tr"></span>
+              <span class="vf-corner vf-bl"></span>
+              <span class="vf-corner vf-br"></span>
+            </div>
+
             <div class="ba-layer ba-after">
-              <video id="processedVideo" class="frame" style="object-fit: contain; width: 100%; height: 100%; background: #000" hidden></video><img id="processedImage" class="frame" style="object-fit: contain; width: 100%; height: 100%; background: #000" hidden>
-              <span class="ba-badge badge-after" id="afterBadge">After</span><div id="processedEmpty" class="empty-state">Your preview will appear here</div>
+              <video id="processedVideo" class="frame" style="object-fit: contain; width: 100%; height: 100%; background: #000" hidden></video>
+              <img id="processedImage" class="frame" style="object-fit: contain; width: 100%; height: 100%; background: #000" hidden>
+              <button type="button" class="ba-badge badge-after" id="afterBadge" title="Click to reveal full Cleaned result">
+                <span class="badge-dot dot-after"></span>
+                <span>Clean</span>
+              </button>
+              <div id="processedEmpty" class="empty-state empty-after">
+                <div class="empty-content">
+                  <div class="empty-icon-wrap mint-glow">
+                    <svg class="ic empty-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                      <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3z"/>
+                    </svg>
+                  </div>
+                  <h4 class="empty-title">Cleaned Output</h4>
+                  <p class="empty-desc">Reconstructed preview will appear here</p>
+                </div>
+              </div>
             </div>
             <div class="ba-layer ba-before">
-              <video id="originalVideo" class="frame" style="object-fit: contain; width: 100%; height: 100%; background: #000" hidden></video><img id="originalImage" class="frame" style="object-fit: contain; width: 100%; height: 100%; background: #000" hidden>
-              <span class="ba-badge badge-before">Before</span><div id="originalEmpty" class="empty-state">Upload a video to begin</div>
+              <video id="originalVideo" class="frame" style="object-fit: contain; width: 100%; height: 100%; background: #000" hidden></video>
+              <img id="originalImage" class="frame" style="object-fit: contain; width: 100%; height: 100%; background: #000" hidden>
+              <button type="button" class="ba-badge badge-before" id="beforeBadge" title="Click to reveal full Original">
+                <span class="badge-dot dot-before"></span>
+                <span>Original</span>
+              </button>
+              <div id="originalEmpty" class="empty-state empty-before">
+                <div class="empty-content">
+                  <div class="empty-icon-wrap blue-glow">
+                    <svg class="ic empty-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                      <rect width="18" height="18" x="3" y="3" rx="2"/><path d="m9 8 7 4-7 4Z"/>
+                    </svg>
+                  </div>
+                  <h4 class="empty-title">Original Video</h4>
+                  <p class="empty-desc">Upload or drop a video to begin comparison</p>
+                </div>
+              </div>
             </div>
                         
-            
-            
             <div class="cmp-handle" id="baHandle" role="slider" tabindex="0" aria-label="Comparison divider" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" aria-orientation="horizontal">
-              <i class="bar"></i>
-              <span class="knob"><svg class="ic"><path d="m9.5 7-5 5 5 5M14.5 7l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <div class="bar">
+                <span class="bar-cap top"></span>
+                <span class="bar-cap bottom"></span>
+              </div>
+              <div class="knob" title="Drag to compare before and after">
+                <div class="knob-bubble" id="knobBubble">50%</div>
+                <svg class="ic knob-arrows" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="8 7 3 12 8 17"/>
+                  <line x1="12" y1="5" x2="12" y2="19" stroke-opacity="0.4"/>
+                  <polyline points="16 7 21 12 16 17"/>
+                </svg>
+              </div>
             </div>
           </div>
           <div class="player-bar">
@@ -1008,33 +1521,132 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; }
       });
       applyTheme(root.getAttribute('data-theme') || 'light');
 
-      /* ---- Before / After comparison slider ---- */
+      /* ---- Enhanced Before / After comparison slider ---- */
       var stage = doc.getElementById('baStage');
       var handle = doc.getElementById('baHandle');
+      var knobBubble = doc.getElementById('knobBubble');
+      var posBadge = doc.getElementById('baPosBadge');
+      var presetBefore = doc.getElementById('presetBefore');
+      var presetSplit = doc.getElementById('presetSplit');
+      var presetAfter = doc.getElementById('presetAfter');
+      var peekBtn = doc.getElementById('peekBtn');
+      var beforeBadge = doc.getElementById('beforeBadge');
+      var afterBadge = doc.getElementById('afterBadge');
+
       if (stage && handle) {
-        var pos = 50, dragging = false;
-        function setPos(p) {
-          pos = Math.max(2, Math.min(98, p));
-          stage.style.setProperty('--pos', pos + '%');
-          handle.setAttribute('aria-valuenow', Math.round(pos));
+        var pos = 50, dragging = false, animTimeout = null;
+        var savedPosBeforePeek = 50;
+
+        function updateUI(p) {
+          var rounded = Math.round(p);
+          stage.style.setProperty('--pos', p + '%');
+          handle.setAttribute('aria-valuenow', rounded);
+          if (knobBubble) knobBubble.textContent = rounded + '%';
+          if (posBadge) posBadge.textContent = rounded + '%';
+
+          if (presetBefore && presetSplit && presetAfter) {
+            presetBefore.classList.toggle('active', rounded >= 85);
+            presetSplit.classList.toggle('active', rounded > 20 && rounded < 85);
+            presetAfter.classList.toggle('active', rounded <= 20);
+          }
+
+          if (beforeBadge) {
+            beforeBadge.style.opacity = p < 25 ? Math.max(0.2, p / 25) : '';
+          }
+          if (afterBadge) {
+            afterBadge.style.opacity = p > 75 ? Math.max(0.2, (100 - p) / 25) : '';
+          }
         }
+
+        function setPos(p, animate) {
+          pos = Math.max(2, Math.min(98, p));
+          if (animate) {
+            stage.classList.add('is-animating');
+            clearTimeout(animTimeout);
+            animTimeout = setTimeout(function () {
+              stage.classList.remove('is-animating');
+            }, 360);
+          } else {
+            stage.classList.remove('is-animating');
+          }
+          updateUI(pos);
+        }
+
         function fromEvent(e) {
           var r = stage.getBoundingClientRect();
-          setPos((e.clientX - r.left) / r.width * 100);
+          if (r.width > 0) {
+            setPos(((e.clientX - r.left) / r.width) * 100, false);
+          }
         }
+
+        // Pointer drag & click-to-position
         stage.addEventListener('pointerdown', function (e) {
+          if (e.target.closest('.ba-badge') || e.target.closest('button')) return;
           dragging = true;
+          stage.classList.add('is-dragging');
           try { stage.setPointerCapture(e.pointerId); } catch (err) {}
           fromEvent(e);
         });
-        stage.addEventListener('pointermove', function (e) { if (dragging) fromEvent(e); });
+
+        stage.addEventListener('pointermove', function (e) {
+          if (dragging) fromEvent(e);
+        });
+
         ['pointerup', 'pointercancel'].forEach(function (ev) {
-          stage.addEventListener(ev, function () { dragging = false; });
+          stage.addEventListener(ev, function () {
+            dragging = false;
+            stage.classList.remove('is-dragging');
+          });
         });
+
+        // Double click to reset to 50/50
+        stage.addEventListener('dblclick', function (e) {
+          if (e.target.closest('.ba-badge') || e.target.closest('button')) return;
+          setPos(50, true);
+        });
+
+        // Keyboard navigation
         handle.addEventListener('keydown', function (e) {
-          if (e.key === 'ArrowLeft') { setPos(pos - 3); e.preventDefault(); }
-          if (e.key === 'ArrowRight') { setPos(pos + 3); e.preventDefault(); }
+          if (e.key === 'ArrowLeft') { setPos(pos - 3, false); e.preventDefault(); }
+          else if (e.key === 'ArrowRight') { setPos(pos + 3, false); e.preventDefault(); }
+          else if (e.key === 'Home') { setPos(98, true); e.preventDefault(); }
+          else if (e.key === 'End') { setPos(2, true); e.preventDefault(); }
         });
+
+        // Presets
+        if (presetBefore) presetBefore.addEventListener('click', function () { setPos(98, true); });
+        if (presetSplit) presetSplit.addEventListener('click', function () { setPos(50, true); });
+        if (presetAfter) presetAfter.addEventListener('click', function () { setPos(2, true); });
+
+        // Badge clicks
+        if (beforeBadge) beforeBadge.addEventListener('click', function (e) { e.stopPropagation(); setPos(98, true); });
+        if (afterBadge) afterBadge.addEventListener('click', function (e) { e.stopPropagation(); setPos(2, true); });
+
+        // Hold to Peek original
+        if (peekBtn) {
+          function startPeek(e) {
+            e.preventDefault();
+            savedPosBeforePeek = pos;
+            peekBtn.classList.add('is-peeking');
+            setPos(98, true);
+          }
+          function stopPeek(e) {
+            e.preventDefault();
+            peekBtn.classList.remove('is-peeking');
+            setPos(savedPosBeforePeek, true);
+          }
+          peekBtn.addEventListener('pointerdown', startPeek);
+          peekBtn.addEventListener('pointerup', stopPeek);
+          peekBtn.addEventListener('pointercancel', stopPeek);
+          peekBtn.addEventListener('mouseleave', function () {
+            if (peekBtn.classList.contains('is-peeking')) {
+              peekBtn.classList.remove('is-peeking');
+              setPos(savedPosBeforePeek, true);
+            }
+          });
+        }
+
+        updateUI(50);
       }
 
 
