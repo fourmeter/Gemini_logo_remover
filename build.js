@@ -294,28 +294,110 @@ const workerCtx = await esbuild.context({
   sourcemap: !isProd,
 });
 
+// Build inline worker code for userscript (Blob Worker)
+const userscriptWorkerBuild = await esbuild.build({
+  ...commonConfig,
+  entryPoints: ['src/workers/watermarkWorker.js'],
+  format: 'iife',
+  platform: 'browser',
+  target: ['es2020'],
+  write: false,
+  sourcemap: false,
+});
+const userscriptWorkerCode = userscriptWorkerBuild.outputFiles?.[0]?.text || '';
+const userscriptPageProcessorCode = '';
+
+
+
+// Build userscript
+const userscriptCtx = await esbuild.context({
+  ...commonConfig,
+  entryPoints: ['src/userscript/index.js'],
+  format: 'iife',
+  outfile: 'dist/userscript/gemini-watermark-remover.user.js',
+  banner: { js: userscriptBanner },
+  minify: false,
+  define: {
+    __US_WORKER_CODE__: JSON.stringify(userscriptWorkerCode),
+    __US_PAGE_PROCESSOR_CODE__: JSON.stringify(userscriptPageProcessorCode),
+    __US_INLINE_WORKER_ENABLED__: 'false',
+    __GWR_AUTO_INIT_USERSCRIPT__: 'true'
+  }
+});
+
+const extensionMainCtx = await esbuild.context({
+  ...commonConfig,
+  entryPoints: ['src/extension/contentMain.js'],
+  format: 'iife',
+  outfile: 'dist/extension/content-main.js',
+  platform: 'browser',
+  target: ['es2020'],
+  minify: isProd,
+  define: {
+    __US_WORKER_CODE__: JSON.stringify(userscriptWorkerCode),
+    __US_PAGE_PROCESSOR_CODE__: JSON.stringify(userscriptPageProcessorCode),
+    __US_INLINE_WORKER_ENABLED__: 'false',
+    __GWR_AUTO_INIT_USERSCRIPT__: 'false'
+  }
+});
+
+const extensionIsolatedCtx = await esbuild.context({
+  ...commonConfig,
+  entryPoints: ['src/extension/isolatedBridge.js'],
+  format: 'iife',
+  outfile: 'dist/extension/isolated-bridge.js',
+  platform: 'browser',
+  target: ['es2020'],
+  minify: isProd
+});
+
+const extensionServiceWorkerCtx = await esbuild.context({
+  ...commonConfig,
+  entryPoints: ['src/extension/serviceWorker.js'],
+  format: 'iife',
+  outfile: 'dist/extension/service-worker.js',
+  platform: 'browser',
+  target: ['es2020'],
+  minify: isProd
+});
 
 console.log(`🚀 Starting build process... [${isProd ? 'PRODUCTION' : 'DEVELOPMENT'}]`);
 
 cleanDistBuildOutputs();
+mkdirSync('dist/userscript', { recursive: true });
 mkdirSync('dist/workers', { recursive: true });
-try {
-  cpSync('public', 'dist', { recursive: true });
-} catch (e) {
-  // public might not exist or be empty
-}
+mkdirSync(join(EXTENSION_DIR, 'assets'), { recursive: true });
+writeExtensionManifest();
+copyExtensionStaticAssets();
 
 if (isProd) {
   await Promise.all([
+    
     videoWebsiteCtx.rebuild(),
-    workerCtx.rebuild()
+    workerCtx.rebuild(),
+    userscriptCtx.rebuild(),
+    extensionMainCtx.rebuild(),
+    extensionIsolatedCtx.rebuild(),
+    extensionServiceWorkerCtx.rebuild()
   ]);
+  writeExtensionManifest();
+  copyExtensionStaticAssets();
+  try {
+    cpSync('public', 'dist', { recursive: true });
+  } catch (e) {
+    // ignore
+  }
   console.log('✅ Build complete!');
   process.exit(0);
 } else {
   await Promise.all([
+    
     videoWebsiteCtx.watch(),
-    workerCtx.watch()
+    workerCtx.watch(),
+    userscriptCtx.watch(),
+    extensionMainCtx.watch(),
+    extensionIsolatedCtx.watch(),
+    extensionServiceWorkerCtx.watch()
   ]);
 
   const watchDir = (dir, dest) => {
@@ -336,6 +418,17 @@ if (isProd) {
     });
   };
   watchDir('public', 'dist');
+  watch('src/extension', (eventType, filename) => {
+    if (
+      filename === 'popup.html' ||
+      filename === 'popup.css' ||
+      filename === 'popup.js' ||
+      filename?.startsWith('assets')
+    ) {
+      copyExtensionStaticAssets();
+      writeExtensionManifest();
+    }
+  });
 
   await serveStaticDevDist('dist');
 
