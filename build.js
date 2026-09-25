@@ -299,6 +299,11 @@ console.log(`🚀 Starting build process... [${isProd ? 'PRODUCTION' : 'DEVELOPM
 
 cleanDistBuildOutputs();
 mkdirSync('dist/workers', { recursive: true });
+try {
+  cpSync('public', 'dist', { recursive: true });
+} catch (e) {
+  // public might not exist or be empty
+}
 
 if (isProd) {
   await Promise.all([
