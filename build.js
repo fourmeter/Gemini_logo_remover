@@ -117,10 +117,18 @@ function writeExtensionManifest(outputDir = EXTENSION_DIR, options = { profile: 
 
 function copyExtensionStaticAssets(outputDir = EXTENSION_DIR) {
   mkdirSync(join(outputDir, 'assets'), { recursive: true });
-  cpSync('src/extension/assets', join(outputDir, 'assets'), { recursive: true });
-  cpSync('src/extension/popup.html', join(outputDir, 'popup.html'));
-  cpSync('src/extension/popup.css', join(outputDir, 'popup.css'));
-  cpSync('src/extension/popup.js', join(outputDir, 'popup.js'));
+  if (existsSync('src/extension/assets')) {
+    cpSync('src/extension/assets', join(outputDir, 'assets'), { recursive: true });
+  }
+  if (existsSync('src/extension/popup.html')) {
+    cpSync('src/extension/popup.html', join(outputDir, 'popup.html'));
+  }
+  if (existsSync('src/extension/popup.css')) {
+    cpSync('src/extension/popup.css', join(outputDir, 'popup.css'));
+  }
+  if (existsSync('src/extension/popup.js')) {
+    cpSync('src/extension/popup.js', join(outputDir, 'popup.js'));
+  }
 }
 
 function cleanDistBuildOutputs() {
@@ -310,56 +318,68 @@ const userscriptPageProcessorCode = '';
 
 
 // Build userscript
-const userscriptCtx = await esbuild.context({
-  ...commonConfig,
-  entryPoints: ['src/userscript/index.js'],
-  format: 'iife',
-  outfile: 'dist/userscript/gemini-watermark-remover.user.js',
-  banner: { js: userscriptBanner },
-  minify: false,
-  define: {
-    __US_WORKER_CODE__: JSON.stringify(userscriptWorkerCode),
-    __US_PAGE_PROCESSOR_CODE__: JSON.stringify(userscriptPageProcessorCode),
-    __US_INLINE_WORKER_ENABLED__: 'false',
-    __GWR_AUTO_INIT_USERSCRIPT__: 'true'
-  }
-});
+let userscriptCtx = null;
+if (existsSync('src/userscript/index.js')) {
+  userscriptCtx = await esbuild.context({
+    ...commonConfig,
+    entryPoints: ['src/userscript/index.js'],
+    format: 'iife',
+    outfile: 'dist/userscript/gemini-watermark-remover.user.js',
+    banner: { js: userscriptBanner },
+    minify: false,
+    define: {
+      __US_WORKER_CODE__: JSON.stringify(userscriptWorkerCode),
+      __US_PAGE_PROCESSOR_CODE__: JSON.stringify(userscriptPageProcessorCode),
+      __US_INLINE_WORKER_ENABLED__: 'false',
+      __GWR_AUTO_INIT_USERSCRIPT__: 'true'
+    }
+  });
+}
 
-const extensionMainCtx = await esbuild.context({
-  ...commonConfig,
-  entryPoints: ['src/extension/contentMain.js'],
-  format: 'iife',
-  outfile: 'dist/extension/content-main.js',
-  platform: 'browser',
-  target: ['es2020'],
-  minify: isProd,
-  define: {
-    __US_WORKER_CODE__: JSON.stringify(userscriptWorkerCode),
-    __US_PAGE_PROCESSOR_CODE__: JSON.stringify(userscriptPageProcessorCode),
-    __US_INLINE_WORKER_ENABLED__: 'false',
-    __GWR_AUTO_INIT_USERSCRIPT__: 'false'
-  }
-});
+let extensionMainCtx = null;
+if (existsSync('src/extension/contentMain.js')) {
+  extensionMainCtx = await esbuild.context({
+    ...commonConfig,
+    entryPoints: ['src/extension/contentMain.js'],
+    format: 'iife',
+    outfile: 'dist/extension/content-main.js',
+    platform: 'browser',
+    target: ['es2020'],
+    minify: isProd,
+    define: {
+      __US_WORKER_CODE__: JSON.stringify(userscriptWorkerCode),
+      __US_PAGE_PROCESSOR_CODE__: JSON.stringify(userscriptPageProcessorCode),
+      __US_INLINE_WORKER_ENABLED__: 'false',
+      __GWR_AUTO_INIT_USERSCRIPT__: 'false'
+    }
+  });
+}
 
-const extensionIsolatedCtx = await esbuild.context({
-  ...commonConfig,
-  entryPoints: ['src/extension/isolatedBridge.js'],
-  format: 'iife',
-  outfile: 'dist/extension/isolated-bridge.js',
-  platform: 'browser',
-  target: ['es2020'],
-  minify: isProd
-});
+let extensionIsolatedCtx = null;
+if (existsSync('src/extension/isolatedBridge.js')) {
+  extensionIsolatedCtx = await esbuild.context({
+    ...commonConfig,
+    entryPoints: ['src/extension/isolatedBridge.js'],
+    format: 'iife',
+    outfile: 'dist/extension/isolated-bridge.js',
+    platform: 'browser',
+    target: ['es2020'],
+    minify: isProd
+  });
+}
 
-const extensionServiceWorkerCtx = await esbuild.context({
-  ...commonConfig,
-  entryPoints: ['src/extension/serviceWorker.js'],
-  format: 'iife',
-  outfile: 'dist/extension/service-worker.js',
-  platform: 'browser',
-  target: ['es2020'],
-  minify: isProd
-});
+let extensionServiceWorkerCtx = null;
+if (existsSync('src/extension/serviceWorker.js')) {
+  extensionServiceWorkerCtx = await esbuild.context({
+    ...commonConfig,
+    entryPoints: ['src/extension/serviceWorker.js'],
+    format: 'iife',
+    outfile: 'dist/extension/service-worker.js',
+    platform: 'browser',
+    target: ['es2020'],
+    minify: isProd
+  });
+}
 
 console.log(`🚀 Starting build process... [${isProd ? 'PRODUCTION' : 'DEVELOPMENT'}]`);
 
@@ -372,14 +392,13 @@ copyExtensionStaticAssets();
 
 if (isProd) {
   await Promise.all([
-    
     videoWebsiteCtx.rebuild(),
     workerCtx.rebuild(),
-    userscriptCtx.rebuild(),
-    extensionMainCtx.rebuild(),
-    extensionIsolatedCtx.rebuild(),
-    extensionServiceWorkerCtx.rebuild()
-  ]);
+    userscriptCtx?.rebuild(),
+    extensionMainCtx?.rebuild(),
+    extensionIsolatedCtx?.rebuild(),
+    extensionServiceWorkerCtx?.rebuild()
+  ].filter(Boolean));
   writeExtensionManifest();
   copyExtensionStaticAssets();
   try {
@@ -391,14 +410,13 @@ if (isProd) {
   process.exit(0);
 } else {
   await Promise.all([
-    
     videoWebsiteCtx.watch(),
     workerCtx.watch(),
-    userscriptCtx.watch(),
-    extensionMainCtx.watch(),
-    extensionIsolatedCtx.watch(),
-    extensionServiceWorkerCtx.watch()
-  ]);
+    userscriptCtx?.watch(),
+    extensionMainCtx?.watch(),
+    extensionIsolatedCtx?.watch(),
+    extensionServiceWorkerCtx?.watch()
+  ].filter(Boolean));
 
   const watchDir = (dir, dest) => {
     let debounceTimer = null;
@@ -417,18 +435,22 @@ if (isProd) {
       }, 100);
     });
   };
-  watchDir('public', 'dist');
-  watch('src/extension', (eventType, filename) => {
-    if (
-      filename === 'popup.html' ||
-      filename === 'popup.css' ||
-      filename === 'popup.js' ||
-      filename?.startsWith('assets')
-    ) {
-      copyExtensionStaticAssets();
-      writeExtensionManifest();
-    }
-  });
+  if (existsSync('public')) {
+    watchDir('public', 'dist');
+  }
+  if (existsSync('src/extension')) {
+    watch('src/extension', (eventType, filename) => {
+      if (
+        filename === 'popup.html' ||
+        filename === 'popup.css' ||
+        filename === 'popup.js' ||
+        filename?.startsWith('assets')
+      ) {
+        copyExtensionStaticAssets();
+        writeExtensionManifest();
+      }
+    });
+  }
 
   await serveStaticDevDist('dist');
 
