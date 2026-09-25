@@ -21,51 +21,55 @@
     /* ============ Tokens ============ */
     :root, :root[data-theme="light"] {
       color-scheme: light;
-      --bg: #F7F5F1;
+      --bg: #F7F7F8;
       --surface: #FFFFFF;
-      --surface-2: #F0EEEA;
-      --text: #181716;
-      --muted: #6F6A63;
-      --border: #E7E2DA;
-      --border-2: #DCD8CF;
-      --accent: #C65D22;
-      --accent-2: #B0501A;
+      --surface-2: #F4F4F5;
+      --surface-3: #EDEDF0;
+      --text: #18181B;
+      --muted: #71717A;
+      --border: #E4E4E7;
+      --border-2: #D4D4D8;
+      --accent: #7C3AED;
+      --accent-2: #8B5CF6;
       --accent-ink: #FFFFFF;
-      --accent-soft: rgba(198, 93, 34, 0.10);
-      --green: #297A4C;
-      --green-bg: #EAF3EC;
-      --green-bd: #CBE2D3;
-      --red: #C94236;
-      --red-bg: #FAEDEB;
-      --red-bd: #E8C9C5;
-      --shadow: 0 4px 12px rgba(24, 23, 22, 0.04), 0 16px 40px -16px rgba(24, 23, 22, 0.12);
-      --shadow-sm: 0 1px 3px rgba(24, 23, 22, 0.06);
+      --accent-soft: rgba(124, 58, 237, 0.10);
+      --green: #16A34A;
+      --green-bg: rgba(22, 163, 74, 0.10);
+      --green-bd: rgba(22, 163, 74, 0.25);
+      --red: #DC2626;
+      --red-bg: rgba(220, 38, 38, 0.10);
+      --red-bd: rgba(220, 38, 38, 0.25);
+      --cyan: #06B6D4;
+      --shadow: 0 20px 60px rgba(0,0,0,.35);
+      --shadow-sm: 0 4px 14px rgba(0,0,0,.22);
       --font: "Inter", "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      --mono: "SF Mono", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
       --radius-card: 18px;
       --radius-btn: 12px;
     }
     :root[data-theme="dark"] {
       color-scheme: dark;
-      --bg: #121110;
-      --surface: #1C1A19;
-      --surface-2: #282624;
-      --text: #F2F0ED;
-      --muted: #9E9A93;
-      --border: #36322F;
-      --border-2: #48433F;
-      --accent: #E57335;
-      --accent-2: #F08A52;
-      --accent-ink: #1C0A02;
-      --accent-soft: rgba(229, 115, 53, 0.15);
-      --green: #8CCBA5;
-      --green-bg: #1B2E24;
-      --green-bd: #2E4E3C;
-      --red: #E67A6E;
-      --red-bg: #351C1A;
-      --red-bd: #5E322D;
-      --shadow: 0 12px 40px -16px rgba(0, 0, 0, 0.6);
-      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+      --bg: #09090B;
+      --surface: #111114;
+      --surface-2: #18181C;
+      --surface-3: #202025;
+      --text: #FAFAFA;
+      --muted: #A1A1AA;
+      --border: #27272A;
+      --border-2: #3F3F46;
+      --accent: #8B5CF6;
+      --accent-2: #A78BFA;
+      --accent-ink: #FFFFFF;
+      --accent-soft: rgba(139, 92, 246, 0.14);
+      --green: #22C55E;
+      --green-bg: rgba(34, 197, 94, 0.10);
+      --green-bd: rgba(34, 197, 94, 0.25);
+      --red: #EF4444;
+      --red-bg: rgba(239, 68, 68, 0.10);
+      --red-bd: rgba(239, 68, 68, 0.25);
+      --cyan: #22D3EE;
+      --shadow: 0 20px 60px rgba(0,0,0,.25);
+      --shadow-sm: 0 4px 14px rgba(0,0,0,.22);
     }
 
     /* ============ Base ============ */
@@ -73,7 +77,7 @@
     html { -webkit-text-size-adjust: 100%; }
     body {
       margin: 0;
-      background: var(--bg);
+      background: radial-gradient(circle at 50% -20%, rgba(139,92,246,.12), transparent 38%), var(--bg);
       color: var(--text);
       font-family: var(--font);
       font-size: 15px;
@@ -104,9 +108,11 @@
     .topbar-in { height: 72px; display: flex; align-items: center; gap: 24px; }
     .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
     .brand-mark {
-      width: 32px; height: 32px; border-radius: 8px;
-      color: var(--accent);
+      width: 32px; height: 32px; border-radius: 10px;
+      color: #fff;
+      background: linear-gradient(135deg, var(--accent), #6D5DF5);
       display: grid; place-items: center;
+      box-shadow: 0 4px 12px var(--accent-soft);
     }
     .brand-name { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; color: var(--text); }
     .nav { display: flex; gap: 32px; margin-left: 24px; }
@@ -116,39 +122,47 @@
     .live-badge {
       display: inline-flex; align-items: center; gap: 8px;
       height: 34px; padding: 0 14px; border-radius: 999px;
-      background: var(--surface); border: 1px solid var(--border);
-      color: var(--text); font-size: 13px; font-weight: 600;
-      box-shadow: var(--shadow-sm);
+      background: transparent; border: none;
+      color: var(--muted); font-size: 13px; font-weight: 500;
+      box-shadow: none;
     }
+    .live-badge .dot {
+      display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green-bd);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0% { opacity: .6; } 50% { opacity: 1; } 100% { opacity: .6; } }
     .theme-toggle {
       width: 40px; height: 40px; padding: 0; border-radius: 50%;
       border: 1px solid var(--border); background: var(--surface); color: var(--muted);
       display: grid; place-items: center; transition: color .15s, border-color .15s, background .15s;
     }
-    .theme-toggle:hover { color: var(--accent); border-color: var(--accent-soft); background: var(--surface-2); }
-    .theme-toggle .ic { width: 18px; height: 18px; }
+    .theme-toggle:hover { color: var(--text); border-color: var(--border-2); background: var(--surface-2); }
+    .theme-toggle .ic { width: 16px; height: 16px; }
     .theme-toggle .icon-sun { display: none; }
     :root[data-theme="dark"] .theme-toggle .icon-sun { display: block; }
     :root[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
 
     /* ============ Hero ============ */
-    .hero { text-align: center; padding: 80px 0 64px; }
+    .hero { text-align: center; padding: 100px 0 80px; }
     .hero h1 {
       margin: 0;
       font-family: "Instrument Serif", "DM Serif Display", var(--font);
-      font-size: clamp(2.5rem, 5vw, 4rem);
-      font-weight: 400; letter-spacing: -0.01em; line-height: 1.1;
+      font-size: clamp(3rem, 7vw, 5.8rem);
+      font-weight: 400; letter-spacing: -0.055em; line-height: .95;
       color: var(--text);
     }
-    .hero .sub { margin: 24px auto 0; max-width: 580px; color: var(--muted); font-size: 18px; line-height: 1.5; }
-    .trust { list-style: none; display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; padding: 0; margin: 32px 0 0; }
+    .hero h1 .accent-word { color: var(--accent); }
+    .hero .sub { margin: 24px auto 0; max-width: 580px; color: var(--muted); font-size: 18px; line-height: 1.5; font-family: var(--font); }
+    .trust { list-style: none; display: flex; flex-wrap: wrap; justify-content: center; gap: 24px; padding: 0; margin: 40px 0 0; }
     .trust li {
       display: inline-flex; align-items: center; gap: 8px;
-      height: 38px; padding: 0 16px; border-radius: 999px;
-      background: var(--surface); border: 1px solid var(--border);
-      font-size: 13.5px; font-weight: 500; box-shadow: var(--shadow-sm); color: var(--text);
+      background: transparent; border: none; padding: 0; height: auto;
+      font-size: 13.5px; font-weight: 500; box-shadow: none; color: var(--text);
+      font-family: var(--mono);
     }
-    .trust .ic { width: 16px; height: 16px; color: var(--muted); }
+    .trust .ic { width: 14px; height: 14px; color: var(--muted); }
 
     /* ============ Workspace ============ */
     .workspace {
@@ -186,12 +200,12 @@
     .btn:active { transform: translateY(1px); }
     .btn .ic { width: 18px; height: 18px; }
     .btn-primary {
-      background: var(--text); border-color: var(--text); color: var(--bg);
-      box-shadow: 0 4px 12px rgba(24, 23, 22, 0.15);
+      background: var(--accent); border-color: var(--accent); color: #fff;
+      box-shadow: 0 8px 24px var(--accent-soft);
     }
-    .btn-primary:hover { background: var(--muted); border-color: var(--muted); color: var(--bg); }
-    :root[data-theme="dark"] .btn-primary { background: var(--text); color: var(--bg); }
-    :root[data-theme="dark"] .btn-primary:hover { background: var(--muted); }
+    .btn-primary:hover { background: #7C3AED; border-color: #7C3AED; color: #fff; box-shadow: 0 10px 28px var(--accent-soft); }
+    :root[data-theme="dark"] .btn-primary { background: var(--accent); color: #fff; }
+    :root[data-theme="dark"] .btn-primary:hover { background: #7C3AED; color: #fff; }
     .btn-tonal { background: var(--surface-2); border-color: transparent; color: var(--text); box-shadow: none; }
     .btn-tonal:hover { background: var(--border); border-color: transparent; }
     .btn-ghost { background: transparent; border-color: transparent; color: var(--muted); box-shadow: none; }
@@ -233,17 +247,19 @@
     .ba-divider {
       position: absolute; top: 0; bottom: 0; left: var(--pos); z-index: 6;
       width: 2px; transform: translateX(-1px);
-      background: #fff; pointer-events: none;
-      box-shadow: 0 0 0 1px rgba(0,0,0,.18), 0 0 14px rgba(0,0,0,.3);
+      background: var(--accent); pointer-events: none;
+      box-shadow: 0 0 0 1px rgba(0,0,0,.18), 0 0 14px var(--accent-soft);
     }
     .ba-handle {
       position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      width: 44px; height: 44px; border-radius: 50%;
-      background: #fff; color: #38321f;
-      border: 1px solid rgba(0,0,0,.1);
+      width: 46px; height: 46px; border-radius: 50%;
+      background: var(--surface); color: var(--text);
+      border: 1px solid var(--accent);
       box-shadow: 0 4px 16px rgba(0,0,0,.3);
       display: grid; place-items: center; cursor: ew-resize;
+      transition: box-shadow .2s;
     }
+    .ba-handle:hover { box-shadow: 0 6px 20px var(--accent-soft); }
     .ba-handle:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 
     /* Detection overlay (SVG, theme-aware) */
@@ -311,15 +327,17 @@
     .drop {
       margin: 24px; padding: 56px 32px; text-align: center;
       border: 1px dashed var(--border-2); border-radius: 16px;
-      transition: border-color .25s, background .25s; cursor: pointer;
+      transition: border-color .25s, background .25s, box-shadow .25s; cursor: pointer;
       background: var(--surface-2);
     }
-    .drop:hover, .drop.dragging { border-color: var(--accent); background: var(--surface); }
+    .drop:hover, .drop.dragging { border-color: var(--accent); background: var(--accent-soft); box-shadow: 0 0 0 1px var(--accent); }
     .drop-icon {
       width: 64px; height: 64px; margin: 0 auto 20px; border-radius: 50%;
-      background: var(--surface); color: var(--accent); border: 1px solid var(--border-2);
+      background: var(--surface); color: var(--text); border: 1px solid var(--border-2);
       display: grid; place-items: center; box-shadow: var(--shadow-sm);
+      transition: transform .25s, color .25s, border-color .25s;
     }
+    .drop:hover .drop-icon, .drop.dragging .drop-icon { transform: scale(1.05); color: var(--accent); border-color: var(--accent); }
     .drop-icon .ic { width: 28px; height: 28px; }
     .drop h3 { margin: 0; font-size: 18px; font-weight: 600; color: var(--text); }
     .drop .fmt { margin: 8px 0 24px; color: var(--muted); font-size: 14px; }
@@ -345,9 +363,9 @@
       background: var(--surface); border: 1px solid var(--border-2); color: var(--muted);
     }
     .step-dot .ic { width: 15px; height: 15px; }
-    .step.done .step-dot { background: var(--green); border-color: var(--green); color: #fff; }
-    :root[data-theme="dark"] .step.done .step-dot { color: #10241a; }
-    .step.current .step-dot { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); box-shadow: 0 0 0 4px var(--accent-soft); }
+    .step.done .step-dot { background: var(--surface); border-color: var(--green); color: var(--green); }
+    :root[data-theme="dark"] .step.done .step-dot { color: var(--green); }
+    .step.current .step-dot { background: var(--accent); border-color: var(--accent); color: #fff; box-shadow: 0 0 12px var(--accent-soft); }
     .step-title { font-size: 14.5px; font-weight: 700; margin: 5px 0 2px; }
     .step.done .step-title { color: var(--green); }
     .step-sub { font-size: 13px; color: var(--muted); margin: 0; }
@@ -381,11 +399,11 @@
     }
     .proc-top { display: flex; align-items: center; gap: 20px; padding: 24px 24px 16px; }
     .proc-top > div:last-child { flex: 1; min-width: 0; }
-    .ring { position: relative; width: 68px; height: 68px; flex: none; }
+    .ring { position: relative; width: 68px; height: 68px; flex: none; filter: drop-shadow(0 0 8px var(--accent-soft)); }
     .ring svg { width: 68px; height: 68px; transform: rotate(-90deg); }
     .ring-track { fill: none; stroke: var(--border-2); stroke-width: 4; }
     .ring-fill { fill: none; stroke: var(--accent); stroke-width: 4; stroke-linecap: round; stroke-dasharray: 188.5; stroke-dashoffset: 188.5; transition: stroke .3s, stroke-dashoffset 0.2s linear; }
-    .ring b { position: absolute; inset: 0; display: grid; place-items: center; font-size: 14px; font-weight: 600; }
+    .ring b { position: absolute; inset: 0; display: grid; place-items: center; font-size: 15px; font-weight: 600; font-family: var(--mono); }
     .proc-top h3 { margin: 0; font-size: 16px; font-weight: 600; color: var(--text); }
     .proc-top p { margin: 4px 0 0; font-size: 14px; color: var(--muted); }
     .proc-bar { padding: 0 24px; }
@@ -608,7 +626,7 @@
   <main class="shell">
     <!-- ============ Hero ============ -->
     <section class="hero">
-      <h1>Remove Video Watermarks — <span class="accent-word">Privately</span></h1>
+      <h1>Remove Video Watermarks.<br><span class="accent-word">Privately.</span></h1>
       <p class="sub">Clean supported Gemini and Veo videos directly in your browser. Your files never leave your device.</p>
       <ul class="trust">
         <li><svg class="ic" aria-hidden="true"><use href="#i-lock"/></svg>Local Processing</li>
@@ -629,11 +647,11 @@
           <div class="ba-stage" id="baStage">
             <div class="ba-layer ba-after">
               <video id="processedVideo" class="frame" style="object-fit: contain; width: 100%; height: 100%; background: #000" hidden></video><img id="processedImage" class="frame" style="object-fit: contain; width: 100%; height: 100%; background: #000" hidden>
-              <span class="ba-badge badge-after" id="afterBadge">After</span><div id="processedEmpty" class="empty-state">Processing will appear here</div>
+              <span class="ba-badge badge-after" id="afterBadge">After</span><div id="processedEmpty" class="empty-state">Your preview will appear here</div>
             </div>
             <div class="ba-layer ba-before">
               <video id="originalVideo" class="frame" style="object-fit: contain; width: 100%; height: 100%; background: #000" hidden></video><img id="originalImage" class="frame" style="object-fit: contain; width: 100%; height: 100%; background: #000" hidden>
-              <span class="ba-badge badge-before">Before</span><div id="originalEmpty" class="empty-state">No video or image selected</div>
+              <span class="ba-badge badge-before">Before</span><div id="originalEmpty" class="empty-state">Upload a video to begin</div>
             </div>
             <div class="ba-divider">
               <div class="ba-handle" id="baHandle" role="slider" tabindex="0"
