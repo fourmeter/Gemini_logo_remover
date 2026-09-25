@@ -43,19 +43,6 @@ jobs:
       - name: Build pipeline
         run: npm run build
 
-      - name: Build webpage (apps/web)
-        run: |
-          cd apps/web
-          pnpm install
-          pnpm run build
-        # We assume the webpage builds into apps/web/dist. 
-        # We'll copy the pipeline's dist into the webpage's dist so they deploy together.
-        
-      - name: Merge pipeline output with webpage output
-        run: |
-          mkdir -p apps/web/dist/pipeline
-          cp -r dist/* apps/web/dist/pipeline/
-
       - name: Setup Pages
         uses: actions/configure-pages@v4
         with:
@@ -64,7 +51,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: 'apps/web/dist'
+          path: 'dist'
 
       - name: Deploy to GitHub Pages
         id: deployment
