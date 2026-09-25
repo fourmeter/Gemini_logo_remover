@@ -3,11 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video Preview</title>
-    <link rel="stylesheet" href="dev-preview.css">
+    <title>Gemini Watermark Remover</title>
+    <style>
+        body { font-family: sans-serif; max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .video-box { border: 1px solid #ccc; padding: 10px; min-height: 300px; display: flex; align-items: center; justify-content: center; background: #eee; }
+        video, img { max-width: 100%; max-height: 100%; }
+        .controls { margin-top: 20px; padding: 15px; background: #f9f9f9; border: 1px solid #ddd; }
+        .control-group { margin-bottom: 10px; }
+        #dropzone { border: 2px dashed #999; padding: 20px; text-align: center; margin-bottom: 20px; cursor: pointer; }
+    </style>
 </head>
 <body>
-    <div id="app"></div>
+    <h1>Gemini Video Watermark Remover</h1>
+    
+    <div id="dropzone">
+        <p>Drop video here or click to select</p>
+        <input type="file" id="fileInput" accept="video/*,image/*" style="display: none;">
+    </div>
+    
+    <div class="grid" id="comparePlayer">
+        <div>
+            <h3>Original</h3>
+            <div class="video-box">
+                <span id="originalEmpty">No video selected</span>
+                <video id="originalVideo" controls hidden></video>
+                <img id="originalImage" hidden>
+            </div>
+        </div>
+        <div>
+            <h3>Processed <span id="afterBadge" hidden>(AI Cleaned)</span></h3>
+            <div class="video-box">
+                <span id="processedEmpty">Processing will appear here</span>
+                <video id="processedVideo" controls hidden></video>
+                <img id="processedImage" hidden>
+            </div>
+        </div>
+    </div>
+    
+    <div class="controls">
+        <div class="control-group">
+            <button id="playPauseBtn" disabled>Play</button>
+            <input type="range" id="scrubber" min="0" max="1000" value="0" disabled style="width: 300px;">
+            <span id="timeLabel">0:00</span>
+        </div>
+        
+        <div class="control-group">
+            <button id="detectBtn" disabled>Detect Watermark</button>
+            <button id="processBtn" disabled>Export & Remove Watermark</button>
+            <a id="downloadBtn" tabindex="-1" aria-disabled="true">Download</a>
+            <button id="resetBtn" disabled>Reset</button>
+            <button id="cancelBtn" disabled>Cancel</button>
+            <button id="relocatedReviewPresetBtn" hidden>Relocated Review Preset</button>
+        </div>
+        
+        <div class="control-group">
+            <div style="margin-bottom: 5px;"><strong>Status:</strong> <span id="status">Waiting for input...</span></div>
+            <div style="width: 100%; background: #ddd; height: 10px; border-radius: 5px;">
+                <div id="progressBar" style="width: 0%; background: #007bff; height: 100%; border-radius: 5px;"></div>
+            </div>
+            <div id="progressText" style="font-size: 12px; margin-top: 2px;">0%</div>
+        </div>
+    </div>
+    
+    <div class="grid" style="margin-top: 20px;">
+        <div class="controls">
+            <h3>Detection Info</h3>
+            <div id="metadata"></div>
+            <div id="detection"></div>
+            <div id="autoPresetSummary"></div>
+        </div>
+        
+        <div class="controls">
+            <h3>Advanced Settings</h3>
+            <div class="control-group">
+                <label>Alpha Gain: <span id="alphaGainValue">1.0</span></label><br>
+                <input type="range" id="alphaGain" min="0.1" max="3" step="0.1" value="1.0">
+            </div>
+            <div class="control-group">
+                <label><input type="checkbox" id="adaptiveAlpha" checked> Adaptive Alpha</label>
+            </div>
+            <div class="control-group">
+                <label><input type="checkbox" id="highQualityCleanup" checked> High Quality Cleanup</label>
+            </div>
+            <div class="control-group">
+                <label><input type="checkbox" id="allowLowConfidence"> Allow Low Confidence</label>
+            </div>
+            <div class="control-group">
+                <label>Denoise Backend:</label>
+                <select id="denoiseBackend">
+                    <option value="allenk_fdncnn_browser_spike">allenk_fdncnn_browser_spike</option>
+                    <option value="none">none</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Edge Denoise: <span id="edgeDenoiseStrengthValue">0.5</span></label><br>
+                <input type="range" id="edgeDenoiseStrength" min="0" max="1" step="0.1" value="0.5">
+            </div>
+            <div class="control-group">
+                <label>Residual Cleanup: <span id="residualCleanupValue">0.5</span></label><br>
+                <input type="range" id="residualCleanup" min="0" max="1" step="0.1" value="0.5">
+            </div>
+            <div class="control-group">
+                <label>Video Bitrate (Mbps):</label>
+                <input type="number" id="videoBitrateMbps" value="5" step="1">
+            </div>
+            <div class="control-group">
+                <label>Sample Count:</label>
+                <input type="number" id="sampleCount" value="10" step="1">
+            </div>
+        </div>
+    </div>
+    
+    <div id="batchQueue" style="display: none;"></div>
+
     <script type="module" src="video-app.js"></script>
+    <script>
+        document.getElementById('dropzone').addEventListener('click', () => {
+            document.getElementById('fileInput').click();
+        });
+        
+        // Setup basic bindings so range inputs update their labels
+        const binds = ['alphaGain', 'edgeDenoiseStrength', 'residualCleanup'];
+        binds.forEach(id => {
+            const el = document.getElementById(id);
+            const valEl = document.getElementById(id + 'Value');
+            if(el && valEl) {
+                el.addEventListener('input', () => { valEl.textContent = el.value; });
+            }
+        });
+    </script>
 </body>
 </html>
