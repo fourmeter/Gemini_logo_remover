@@ -269,7 +269,7 @@ function createDetectionProgressHandler(jobId, { start = 0, span = 1 } = {}) {
             score: 'Matching watermark',
             done: 'Detection complete'
         };
-        setProgress(start + safeProgress * span, labelByStep[step] || 'Detecting');
+        setProgress(start + safeProgress * span);
         if (step === 'sample') {
             setStatus(sampleCount > 0
                 ? `Sampling frames for watermark detection: ${sampledFrames}/${sampleCount}`
@@ -604,7 +604,7 @@ async function runDetection() {
         state.detection = result.detection;
         renderMetadata(result.metadata);
         renderDetection(result.detection);
-        setProgress(1, result.detection.isConfident ? 'Detection complete' : 'Low Confidence');
+        setProgress(1);
         const preset = applyAutomaticPreset(result.detection, result.metadata, { silent: true });
         if (preset.id === 'relocated-review') {
             setStatus('Detection complete, AI watermark removal will be used on export.', result.detection.isConfident ? 'success' : 'warn');
@@ -748,7 +748,7 @@ async function runExport(signal) {
                     renderDetection(detection);
                 }
                 if (phase === 'detect') {
-                    setProgress(progress * 0.12, progress >= 1 ? 'Detection complete' : 'Detecting');
+                    setProgress(progress * 0.12);
                 } else if (phase === 'export') {
                     const exportProgress = 0.12 + progress * 0.88;
                     const frames = Number.isFinite(processedFrames) ? `${processedFrames} frames` : 'Processing';
