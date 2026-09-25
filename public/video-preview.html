@@ -522,9 +522,43 @@
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation: none !important; transition: none !important; }
     }
-  </style>
+  
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+:root {
+  --bg: #FAFAFA; --bg2: #FFFFFF; --panel: #FFFFFF; --panel2: #F3F4F6;
+  --line: rgba(0,0,0,.08); --line2: rgba(0,0,0,.15);
+  --text: #0A0B0F; --muted: #4B5563; --dim: #6B7280;
+  --blue: #2563EB; --mint: #10B981; --amber: #F59E0B; --red: #EF4444;
+  --border: var(--line); --surface: var(--panel); --accent: var(--blue);
+}
+:root[data-theme="dark"] {
+  --bg: #0A0B0F; --bg2: #0E1016; --panel: #12141C; --panel2: #171A24;
+  --line: rgba(255,255,255,.07); --line2: rgba(255,255,255,.15);
+  --text: #EEF0F6; --muted: #A6ADBE; --dim: #6E7688;
+  --blue: #6E9BFF; --mint: #3FDC9E; --amber: #FFB454; --red: #FF7A76;
+  --border: var(--line); --surface: var(--panel); --accent: var(--blue);
+}
+body { font-family: 'Space Grotesk', sans-serif; background: var(--bg); color: var(--text); }
+h1, h2, h3, h4, h5, h6 { font-weight: 600; }
+.card { background: var(--panel); border: 1px solid var(--line); box-shadow: 0 12px 32px rgba(0,0,0,0.05); }
+:root[data-theme="dark"] .card { box-shadow: 0 24px 60px rgba(0,0,0,0.5); }
+.grain { position:fixed; inset:0; z-index:-2; pointer-events:none; opacity:0.04; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.7'/%3E%3C/svg%3E"); }
+.grid-bg { position:fixed; inset:0; z-index:-1; pointer-events:none; background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px); background-size:76px 76px; mask-image:radial-gradient(1100px 640px at 50% 0%,#000 0%,transparent 72%); -webkit-mask-image:radial-gradient(1100px 640px at 50% 0%,#000 0%,transparent 72%); }
+.btn { font-family: 'Space Grotesk', sans-serif; border-radius: 8px; transition: all 0.2s; }
+.btn.primary, .btn-primary { background: var(--text); color: var(--bg); }
+.btn.primary:hover, .btn-primary:hover { transform: translateY(-1px); opacity: 0.9; }
+.btn.ghost, .btn-tonal { border: 1px solid var(--line2); background: transparent; color: var(--text); }
+.btn.ghost:hover, .btn-tonal:hover { border-color: var(--blue); color: var(--blue); }
+.do-inner { border: 1.5px dashed var(--line2); border-radius: 14px; }
+.brand { font-family: 'Space Grotesk', sans-serif; font-weight: 600; }
+
+</style>
 </head>
 <body>
+<div class="grain"></div>
+<div class="grid-bg"></div>
 
   <!-- Icon library -->
   <svg aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
