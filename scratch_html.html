@@ -623,12 +623,14 @@
           </div>
           <div class="ba-stage" id="baStage">
             <div class="ba-layer ba-after">
-              <video id="processedVideo" class="frame" style="object-fit: contain; width: 100%; height: 100%; background: #000" hidden></video><img id="processedImage" class="frame" style="object-fit: contain; width: 100%; height: 100%; background: #000" hidden>
-              <span class="ba-badge badge-after" id="afterBadge">After</span><div id="processedEmpty" style="position:absolute; inset:0; display:grid; place-items:center; color:#fff; font-family:var(--mono); font-size:14px; background:rgba(0,0,0,0.5); z-index:4">Processing will appear here</div>
+              <svg class="frame" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><use href="#scene"/></svg>
+              <span class="ba-badge badge-after">After</span>
             </div>
             <div class="ba-layer ba-before">
-              <video id="originalVideo" class="frame" style="object-fit: contain; width: 100%; height: 100%; background: #000" hidden></video><img id="originalImage" class="frame" style="object-fit: contain; width: 100%; height: 100%; background: #000" hidden>
-              <span class="ba-badge badge-before">Before</span><div id="originalEmpty" style="position:absolute; inset:0; display:grid; place-items:center; color:#fff; font-family:var(--mono); font-size:14px; background:rgba(0,0,0,0.5); z-index:4">No video selected</div>
+              <svg class="frame" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+                <use href="#scene"/><use href="#wm-bbox"/>
+              </svg>
+              <span class="ba-badge badge-before">Before</span>
             </div>
             <div class="ba-divider">
               <div class="ba-handle" id="baHandle" role="slider" tabindex="0"
@@ -640,11 +642,11 @@
             </div>
           </div>
           <div class="player-bar">
-            <button id="playPauseBtn" class="icon-btn" type="button" data-playing="false" aria-label="Play">
+            <button id="playBtn" class="icon-btn" type="button" data-playing="false" aria-label="Play">
               <svg class="ic ic-play" aria-hidden="true"><use href="#i-play"/></svg>
               <svg class="ic ic-pause" aria-hidden="true"><use href="#i-pause"/></svg>
             </button>
-            <input id="scrubber" class="scrub" type="range" min="0" max="1000" value="400" aria-label="Timeline">
+            <input id="scrub" class="scrub" type="range" min="0" max="1000" value="400" aria-label="Timeline">
             <span id="timeLabel" class="mono time">00:04 / 00:10</span>
             <button id="fsBtn" class="icon-btn" type="button" aria-label="Fullscreen">
               <svg class="ic" aria-hidden="true"><use href="#i-expand"/></svg>
@@ -657,7 +659,14 @@
             <span class="card-title"><svg class="ic" aria-hidden="true"><use href="#i-film"/></svg>Video Information</span>
             <svg class="ic chev" aria-hidden="true"><use href="#i-chev"/></svg>
           </summary>
-          <div id="metadata" class="rows">Waiting for video</div>
+          <dl class="rows">
+            <div><dt>Resolution</dt><dd>1920 × 1080 · 16:9</dd></div>
+            <div><dt>Frame rate</dt><dd>30 FPS</dd></div>
+            <div><dt>Duration</dt><dd>00:10</dd></div>
+            <div><dt>Video codec</dt><dd>H.264 (AVC)</dd></div>
+            <div><dt>Audio</dt><dd>AAC · 128 kbps</dd></div>
+            <div><dt>File size</dt><dd>24.3 MB</dd></div>
+          </dl>
         </details>
       </div>
 
@@ -704,9 +713,21 @@
                 <p class="step-title">Watermark detected</p>
                 <p class="step-sub">Found automatically — no manual selection needed.</p>
                 <div class="step-body">
-                  <div class="detect" id="detection">Waiting for detection</div>
-                <div id="autoPresetSummary" style="margin-top: 10px; font-size: 13px;"></div>
-                <button id="detectBtn" class="btn btn-ghost btn-sm" type="button" disabled style="margin-top:10px;"><svg class="ic" aria-hidden="true"><use href="#i-refresh"/></svg>Detect Again</button>
+                  <div class="detect">
+                    <svg class="thumb" viewBox="1100 540 200 180" aria-label="Detected watermark preview">
+                      <use href="#scene"/><use href="#wm-bbox"/>
+                    </svg>
+                    <dl class="detect-info">
+                      <div><dt>Location</dt><dd>Bottom-right</dd></div>
+                      <div><dt>Size</dt><dd>72 × 72 px</dd></div>
+                      <div><dt>Confidence</dt><dd class="conf">98%</dd></div>
+                      <div class="detect-actions">
+                        <button id="detectAgain" class="btn btn-ghost btn-sm" type="button">
+                          <svg class="ic" aria-hidden="true"><use href="#i-refresh"/></svg>Detect Again
+                        </button>
+                      </div>
+                    </dl>
+                  </div>
                 </div>
               </div>
             </li>
@@ -717,10 +738,10 @@
                 <p class="step-title">Remove &amp; Export</p>
                 <p class="step-sub">Every frame is cleaned and re-encoded on your device.</p>
                 <div class="step-body cta-row">
-                  <button id="processBtn" class="btn btn-primary btn-lg" type="button" disabled>
+                  <button class="btn btn-primary btn-lg" type="button">
                     <svg class="ic" aria-hidden="true"><use href="#i-spark"/></svg>Remove Watermark &amp; Export
                   </button>
-                  <button id="resetBtn" class="btn btn-ghost" type="button" disabled>Reset</button>
+                  <button class="btn btn-ghost" type="button">Reset</button>
                 </div>
               </div>
             </li>
@@ -735,14 +756,14 @@
                 <circle class="ring-track" cx="32" cy="32" r="26"/>
                 <circle class="ring-fill" cx="32" cy="32" r="26"/>
               </svg>
-              <b id="progressText">0%</b>
+              <b>63%</b>
             </div>
             <div>
-              <h3 id="status">Waiting...</h3>
+              <h3 id="procTitle">Processing video…</h3>
               <p id="procSub">Inpainting frames locally — nothing is uploaded.</p>
             </div>
           </div>
-          <div class="proc-bar"><div class="bar"><i id="progressBar"></i></div></div>
+          <div class="proc-bar"><div class="bar"><i></i></div></div>
           <div class="proc-meta">
             <span>Frame 684 / 1080</span>
             <span>≈ 12 sec remaining</span>
@@ -751,7 +772,7 @@
             <span class="proc-note" id="procNote">
               <svg class="ic" aria-hidden="true"><use href="#i-lock"/></svg>Video is being processed locally
             </span>
-            <button id="cancelBtn" class="btn btn-danger btn-sm" type="button">
+            <button id="stopBtn" class="btn btn-danger btn-sm" type="button">
               <svg class="ic" aria-hidden="true"><use href="#i-stop"/></svg>Stop Processing
             </button>
           </div>
@@ -768,10 +789,10 @@
               <div><span>Output</span><b>1920 × 1080 · H.264</b></div>
               <div><span>Processing time</span><b>14.2 sec</b></div>
             </div>
-            <a id="downloadBtn" class="btn btn-primary btn-lg" tabindex="-1" aria-disabled="true">
+            <button class="btn btn-primary btn-lg" type="button">
               <svg class="ic" aria-hidden="true"><use href="#i-download"/></svg>Download Video
-            </a>
-            <button class="btn btn-lg" type="button" onclick="document.getElementById('resetBtn').click()">
+            </button>
+            <button class="btn btn-lg" type="button">
               <svg class="ic" aria-hidden="true"><use href="#i-refresh"/></svg>Process Another Video
             </button>
           </div>
@@ -784,38 +805,37 @@
           </summary>
           <div class="adv-body">
             <div class="field">
-              <label>Alpha Gain: <output id="alphaGainValue">1.00</output></label>
-              <input type="range" id="alphaGain" min="0.1" max="3" step="0.1" value="1.0">
-            </div>
-            <div class="field">
-              <label>Edge Denoise Strength: <output id="edgeDenoiseStrengthValue">0.50</output></label>
-              <input type="range" id="edgeDenoiseStrength" min="0" max="1" step="0.1" value="0.5">
-            </div>
-            <div class="field">
-              <label>Residual Cleanup: <output id="residualCleanupValue">0.50</output></label>
-              <input type="range" id="residualCleanup" min="0" max="1" step="0.1" value="0.5">
-            </div>
-            <div class="field">
-              <label for="denoiseBackend">Denoise Backend</label>
-              <select id="denoiseBackend">
-                  <option value="allenk_fdncnn_browser_spike">allenk_fdncnn_browser_spike</option>
-                  <option value="none">none</option>
+              <label for="wmPos">Watermark position</label>
+              <select id="wmPos">
+                <option selected>Bottom right</option>
+                <option>Bottom left</option>
+                <option>Top right</option>
+                <option>Top left</option>
+                <option>Custom region</option>
               </select>
             </div>
             <div class="field">
-              <label for="videoBitrateMbps">Video Bitrate (Mbps)</label>
-              <input type="number" id="videoBitrateMbps" value="5" step="1" class="btn-sm" style="width:100%; border:1px solid var(--border-2); background:var(--surface); border-radius:8px; padding:0 10px;">
+              <label for="quality">Output quality</label>
+              <select id="quality">
+                <option selected>High · H.264 · 12 Mbps</option>
+                <option>Balanced · H.264 · 8 Mbps</option>
+                <option>Compact · H.264 · 5 Mbps</option>
+              </select>
             </div>
             <div class="field">
-              <label for="sampleCount">Sample Count</label>
-              <input type="number" id="sampleCount" value="10" step="1" class="btn-sm" style="width:100%; border:1px solid var(--border-2); background:var(--surface); border-radius:8px; padding:0 10px;">
+              <label for="maskSize">Mask size <output id="maskOut">72 px</output></label>
+              <input id="maskSize" type="range" min="40" max="160" step="4" value="72">
+            </div>
+            <div class="field">
+              <label for="sensitivity">Detection sensitivity <output id="sensOut">80%</output></label>
+              <input id="sensitivity" type="range" min="0" max="100" step="5" value="80">
             </div>
             <div class="checks">
-              <label class="check"><input type="checkbox" id="adaptiveAlpha" checked> Adaptive Alpha</label>
-              <label class="check"><input type="checkbox" id="highQualityCleanup" checked> High Quality Cleanup</label>
-              <label class="check"><input type="checkbox" id="allowLowConfidence"> Allow Low Confidence</label>
+              <label class="check"><input type="checkbox" checked>Process every frame <em>· slower, best quality</em></label>
+              <label class="check"><input type="checkbox" checked>Use AI model (FDnCNN) for texture repair</label>
+              <label class="check"><input type="checkbox">Keep original audio track unchanged</label>
             </div>
-</div>
+          </div>
         </details>
 
         <article class="card privacy-card" id="privacy">
@@ -861,14 +881,124 @@
       });
       applyTheme(root.getAttribute('data-theme') || 'light');
 
-      })();
+      /* ---- Before / After comparison slider ---- */
+      var stage = doc.getElementById('baStage');
+      var handle = doc.getElementById('baHandle');
+      var pos = 50, dragging = false;
+      function setPos(p) {
+        pos = Math.max(2, Math.min(98, p));
+        stage.style.setProperty('--pos', pos + '%');
+        handle.setAttribute('aria-valuenow', Math.round(pos));
+      }
+      function fromEvent(e) {
+        var r = stage.getBoundingClientRect();
+        setPos((e.clientX - r.left) / r.width * 100);
+      }
+      stage.addEventListener('pointerdown', function (e) {
+        dragging = true;
+        try { stage.setPointerCapture(e.pointerId); } catch (err) {}
+        fromEvent(e);
+      });
+      stage.addEventListener('pointermove', function (e) { if (dragging) fromEvent(e); });
+      ['pointerup', 'pointercancel'].forEach(function (ev) {
+        stage.addEventListener(ev, function () { dragging = false; });
+      });
+      handle.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowLeft') { setPos(pos - 3); e.preventDefault(); }
+        if (e.key === 'ArrowRight') { setPos(pos + 3); e.preventDefault(); }
+      });
+
+      /* ---- Mock playback ---- */
+      var playBtn = doc.getElementById('playBtn');
+      var scrub = doc.getElementById('scrub');
+      var timeEl = doc.getElementById('timeLabel');
+      var dur = 10, t = 4, timer = null, playing = false;
+      function fmt(s) {
+        s = Math.max(0, Math.floor(s));
+        var m = Math.floor(s / 60), r = s % 60;
+        return (m < 10 ? '0' : '') + m + ':' + (r < 10 ? '0' : '') + r;
+      }
+      function renderTime() {
+        var pct = t / dur * 100;
+        scrub.value = Math.round(pct * 10);
+        scrub.style.setProperty('--fill', pct + '%');
+        timeEl.textContent = fmt(t) + ' / ' + fmt(dur);
+      }
+      function setPlaying(p) {
+        playing = p;
+        playBtn.setAttribute('data-playing', p);
+        playBtn.setAttribute('aria-label', p ? 'Pause' : 'Play');
+        if (p) {
+          timer = setInterval(function () { t += 0.1; if (t >= dur) t = 0; renderTime(); }, 100);
+        } else if (timer) { clearInterval(timer); timer = null; }
+      }
+      playBtn.addEventListener('click', function () { setPlaying(!playing); });
+      scrub.addEventListener('input', function () { t = scrub.value / 1000 * dur; renderTime(); });
+      renderTime();
+
+      /* ---- Fullscreen ---- */
+      var fsBtn = doc.getElementById('fsBtn');
+      var compCard = doc.getElementById('compareCard');
+      fsBtn.addEventListener('click', function () {
+        if (doc.fullscreenElement) { doc.exitFullscreen && doc.exitFullscreen(); }
+        else if (compCard.requestFullscreen) { compCard.requestFullscreen(); }
+      });
+
+      /* ---- Stop processing (mock) ---- */
+      var stopBtn = doc.getElementById('stopBtn');
+      stopBtn.addEventListener('click', function () {
+        var c = doc.getElementById('procCard');
+        c.classList.add('is-stopped');
+        doc.getElementById('procTitle').textContent = 'Processing stopped';
+        doc.getElementById('procSub').textContent = 'You can start again anytime — nothing was uploaded.';
+        doc.getElementById('procNote').textContent = 'Processing was cancelled. No data left your device.';
+        stopBtn.disabled = true;
+      });
+
+      /* ---- Detect Again (mock refresh) ---- */
+      var det = doc.getElementById('detectAgain');
+      det.addEventListener('click', function () {
+        det.classList.add('is-busy');
+        setTimeout(function () { det.classList.remove('is-busy'); }, 900);
+      });
+
+      /* ---- Upload (mock wiring) ---- */
+      var drop = doc.getElementById('dropzone');
+      var fileInput = doc.getElementById('fileInput');
+      drop.addEventListener('click', function () { fileInput.click(); });
+      drop.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); }
+      });
+      ['dragenter', 'dragover'].forEach(function (ev) {
+        drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.add('dragging'); });
+      });
+      ['dragleave', 'drop'].forEach(function (ev) {
+        drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.remove('dragging'); });
+      });
+      function setFile(f) {
+        if (!f) return;
+        doc.getElementById('fileName').textContent = f.name;
+        doc.getElementById('fileMeta').textContent =
+          '1920 × 1080 · 00:10 · ' + (f.size / 1048576).toFixed(1) + ' MB';
+      }
+      fileInput.addEventListener('change', function () { setFile(fileInput.files[0]); });
+      drop.addEventListener('drop', function (e) {
+        if (e.dataTransfer && e.dataTransfer.files) setFile(e.dataTransfer.files[0]);
+      });
+
+      /* ---- Advanced range outputs ---- */
+      [['maskSize', 'maskOut', ' px'], ['sensitivity', 'sensOut', '%']].forEach(function (pair) {
+        var el = doc.getElementById(pair[0]), out = doc.getElementById(pair[1]);
+        if (!el || !out) return;
+        function sync() {
+          out.textContent = el.value + pair[2];
+          var pct = (el.value - el.min) / (el.max - el.min) * 100;
+          el.style.setProperty('--fill', pct + '%');
+        }
+        el.addEventListener('input', sync);
+        sync();
+      });
+    })();
   </script>
-
-    <div id="batchQueue" style="display: none;"></div>
-    <button id="relocatedReviewPresetBtn" hidden>Relocated</button>
-    <div id="comparePlayer" style="display: none;"></div>
-
-    <script type="module" src="video-app.js"></script>
-
 </body>
 </html>
