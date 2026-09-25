@@ -4,7 +4,96 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#f6f2ea">
-  <title>FourFrame — Remove Video Watermarks. Privately.</title>
+  <title>FourFrame — Remove Video Watermarks Privately | Free In-Browser AI</title>
+  <meta name="description" content="FourFrame is a 100% private, client-side AI video watermark remover. Erase logos and watermarks from MP4 and MOV videos directly in your browser with zero server uploads.">
+  <meta name="keywords" content="video watermark remover, remove watermark from video, AI video watermark remover, Gemini watermark remover, remove logo from video free, private video editor, browser AI video cleaner, inpainting video tool">
+  <meta name="author" content="FourFrame">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <link rel="canonical" href="https://fourframe.app/video-preview">
+
+  <!-- Open Graph / Facebook / LinkedIn -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://fourframe.app/video-preview">
+  <meta property="og:title" content="FourFrame — Remove Video Watermarks Privately | In-Browser AI">
+  <meta property="og:description" content="Erase logos and watermarks from MP4, MOV, and WebP videos directly in your browser. 100% private client-side processing with zero server uploads.">
+  <meta property="og:image" content="/logo.png">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://fourframe.app/video-preview">
+  <meta name="twitter:title" content="FourFrame — Remove Video Watermarks Privately | In-Browser AI">
+  <meta name="twitter:description" content="Erase logos and watermarks from MP4, MOV, and WebP videos directly in your browser. 100% private client-side processing with zero server uploads.">
+  <meta name="twitter:image" content="/logo.png">
+
+  <!-- JSON-LD Structured Data for Search Engine Rich Snippets -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebApplication",
+        "@id": "https://fourframe.app/#webapp",
+        "name": "FourFrame",
+        "url": "https://fourframe.app/video-preview",
+        "applicationCategory": "MultimediaApplication",
+        "operatingSystem": "All modern web browsers",
+        "browserRequirements": "Requires WebAssembly & Web Workers support",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "description": "FourFrame is a free, client-side AI video watermark remover that runs privately inside modern browsers without uploading media to servers.",
+        "featureList": [
+          "100% Client-Side In-Browser Processing",
+          "Deep Neural Network Watermark Reconstruction",
+          "Real-Time Before/After Interactive Comparison",
+          "Support for MP4, MOV, WebM up to 2GB",
+          "Zero Server Storage and No Registration Required"
+        ]
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://fourframe.app/#faq",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Are my videos uploaded to a remote server?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. FourFrame performs all video decoding, frame extraction, AI watermark detection, and neural inpainting entirely on your device using WebAssembly (WASM) and ONNX Runtime. Nothing leaves your browser."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Which video formats and file sizes are supported?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "FourFrame supports MP4, MOV, WebM, and standard video/image formats with files up to 2GB in size."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does the AI watermark removal work?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "FourFrame uses deep learning models to automatically locate watermarks, calculate edge alpha profiles, and reconstruct underlying pixels with temporal and spatial consistency across each video frame."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is FourFrame free to use?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes, FourFrame is completely free to use with no account registration, subscriptions, or watermarks added to your output."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+
   <script>
     /* Apply saved theme before paint (no flash) */
     (function () {
@@ -1069,6 +1158,148 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; }
   transform: translateX(-50%) translateY(0);
 }
 
+/* =========================================================
+   SEO CONTENT: HOW IT WORKS & FAQ SECTIONS
+   ========================================================= */
+.seo-feature-section {
+  padding: 80px 0 60px;
+  border-top: 1px solid var(--border);
+}
+.seo-head {
+  text-align: center;
+  max-width: 640px;
+  margin: 0 auto 48px;
+}
+.seo-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font: 600 11px 'IBM Plex Mono', monospace;
+  letter-spacing: .18em;
+  color: var(--blue);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.seo-title {
+  margin: 0 0 14px;
+  font-size: clamp(1.8rem, 3.2vw, 2.4rem);
+  font-weight: 650;
+  letter-spacing: -0.025em;
+  color: var(--text);
+  line-height: 1.15;
+}
+.seo-sub {
+  margin: 0;
+  font-size: 15.5px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+.seo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+}
+.seo-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 32px 28px;
+  transition: transform .25s, box-shadow .25s, border-color .25s;
+  display: flex;
+  flex-direction: column;
+}
+.seo-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--blue);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.08);
+}
+:root[data-theme="dark"] .seo-card:hover {
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+}
+.seo-card-num {
+  font: 700 12px 'IBM Plex Mono', monospace;
+  color: var(--blue);
+  background: rgba(37, 99, 235, 0.1);
+  padding: 4px 10px;
+  border-radius: 999px;
+  width: fit-content;
+  margin-bottom: 20px;
+}
+:root[data-theme="dark"] .seo-card-num {
+  background: rgba(110, 155, 255, 0.15);
+}
+.seo-card h3 {
+  margin: 0 0 12px;
+  font-size: 18px;
+  font-weight: 650;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+.seo-card p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+/* FAQ section */
+.seo-faq-section {
+  padding: 40px 0 80px;
+}
+.faq-list {
+  max-width: 820px;
+  margin: 0 auto;
+  display: grid;
+  gap: 16px;
+}
+.faq-item {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  transition: border-color .2s, box-shadow .2s;
+}
+.faq-item:hover, .faq-item[open] {
+  border-color: var(--line2);
+  box-shadow: var(--shadow-sm);
+}
+.faq-item[open] {
+  border-color: var(--blue);
+}
+.faq-item summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  user-select: none;
+}
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-chev {
+  width: 18px;
+  height: 18px;
+  color: var(--muted);
+  transition: transform .25s ease;
+  flex: none;
+}
+.faq-item[open] .faq-chev {
+  transform: rotate(180deg);
+  color: var(--blue);
+}
+.faq-content {
+  padding: 0 24px 22px;
+  font-size: 14.5px;
+  color: var(--muted);
+  line-height: 1.65;
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
+}
+
 </style>
 </head>
 <body>
@@ -1165,9 +1396,10 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; }
         <img src="/logo.png" alt="FourFrame" class="brand-logo" style="height: 24px; width: auto; object-fit: contain;">
       </a>
       <nav class="nav" aria-label="Main">
-        <a href="#">How it works</a>
+        <a href="#how-it-works">How it works</a>
+        <a href="#faq">FAQ</a>
         <a href="#privacy">Privacy</a>
-        <a href="#">Help</a>
+        <a href="https://github.com/Agent07-X-lab/Gemini_logo_remover" target="_blank" rel="noopener">GitHub</a>
       </nav>
       <div class="top-actions">
         <span class="live-badge"><i class="dot" aria-hidden="true"></i>Local Processing</span>
@@ -1490,16 +1722,107 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; }
         </article>
       </aside>
     </section>
+
+    <!-- ============ SEO SECTION: How It Works ============ -->
+    <section class="seo-feature-section" id="how-it-works">
+      <div class="seo-head">
+        <span class="seo-eyebrow"><i class="pulse"></i>HOW IT WORKS</span>
+        <h2 class="seo-title">Local AI Video Inpainting in Three Steps</h2>
+        <p class="seo-sub">
+          Unlike traditional web tools that upload your files to remote cloud servers, FourFrame processes everything right inside your browser using hardware acceleration.
+        </p>
+      </div>
+      <div class="seo-grid">
+        <article class="seo-card">
+          <span class="seo-card-num">01 / DECODE</span>
+          <h3>Client-Side Video Decoding</h3>
+          <p>
+            Your video is decoded directly within browser memory using WebAssembly. No bytes are sent over the network, ensuring zero data loss and absolute privacy for sensitive footage.
+          </p>
+        </article>
+        <article class="seo-card">
+          <span class="seo-card-num">02 / DETECT</span>
+          <h3>AI Watermark Localization</h3>
+          <p>
+            Automated neural detection pinpoints watermark boundaries, semi-transparent overlays, and text badges across all video frames with sub-pixel localization accuracy.
+          </p>
+        </article>
+        <article class="seo-card">
+          <span class="seo-card-num">03 / INPAINT</span>
+          <h3>Neural Pixel Reconstruction</h3>
+          <p>
+            Our deep learning model seamlessly fills in masked watermark regions with spatio-temporal pixel consistency, restoring the natural background without blur or halos.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <!-- ============ SEO SECTION: FAQ ============ -->
+    <section class="seo-faq-section" id="faq">
+      <div class="seo-head">
+        <span class="seo-eyebrow">FREQUENTLY ASKED QUESTIONS</span>
+        <h2 class="seo-title">Everything You Need to Know</h2>
+        <p class="seo-sub">Got questions about how FourFrame cleans video watermarks privately? Here are the answers.</p>
+      </div>
+      <div class="faq-list">
+        <details class="faq-item" open>
+          <summary>
+            <span>Are my videos ever uploaded to a server?</span>
+            <svg class="faq-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+          </summary>
+          <div class="faq-content">
+            <strong>Never.</strong> FourFrame executes all AI inference and video rendering locally on your machine via WebAssembly (WASM) and ONNX Runtime Web. Your video never leaves your computer, making it 100% compliant with strict enterprise and personal privacy standards.
+          </div>
+        </details>
+        <details class="faq-item">
+          <summary>
+            <span>What video formats and file sizes are supported?</span>
+            <svg class="faq-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+          </summary>
+          <div class="faq-content">
+            FourFrame supports standard video containers including <strong>MP4, MOV, and WebM</strong>, as well as high-resolution images (PNG, JPG). Files up to <strong>2 GB</strong> in size can be processed directly inside standard modern desktop browsers.
+          </div>
+        </details>
+        <details class="faq-item">
+          <summary>
+            <span>How does AI inpainting compare to conventional blur removal?</span>
+            <svg class="faq-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+          </summary>
+          <div class="faq-content">
+            Traditional tools simply apply a Gaussian blur or mosaic distortion, which creates an obvious smudge over your video. FourFrame uses deep convolutional neural networks to reconstruct the lost pixels, textures, and gradient flows behind the watermark for a clean, natural finish.
+          </div>
+        </details>
+        <details class="faq-item">
+          <summary>
+            <span>Can FourFrame remove Google Gemini and Veo watermarks?</span>
+            <svg class="faq-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+          </summary>
+          <div class="faq-content">
+            Yes! FourFrame has built-in detection profiles specialized for Gemini video badges, Veo text badges, and transparent corner logos, with automatic bounding box alignment and alpha gain calibration.
+          </div>
+        </details>
+        <details class="faq-item">
+          <summary>
+            <span>Is FourFrame free to use?</span>
+            <svg class="faq-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+          </summary>
+          <div class="faq-content">
+            Yes, FourFrame is completely free. There are no subscriptions, account sign-ups, file download limits, or surprise fees.
+          </div>
+        </details>
+      </div>
+    </section>
   </main>
 
   <!-- ============ Footer ============ -->
   <footer>
     <div class="shell foot-in">
-      <span>FourFrame · Local Video Processing</span>
+      <span>FourFrame · Local AI Video Inpainting & Watermark Remover</span>
       <nav class="foot-links" aria-label="Footer">
+        <a href="#how-it-works">How it works</a><i>·</i>
+        <a href="#faq">FAQ</a><i>·</i>
         <a href="#privacy">Privacy</a><i>·</i>
-        <a href="#">How it works</a><i>·</i>
-        <a href="#">GitHub</a>
+        <a href="https://github.com/Agent07-X-lab/Gemini_logo_remover" target="_blank" rel="noopener">GitHub</a>
       </nav>
     </div>
   </footer>

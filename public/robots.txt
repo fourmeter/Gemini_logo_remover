@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Allow: /video-preview
+Allow: /video-preview.html
+Allow: /logo.png
+Disallow: /dev-preview.html
+Disallow: /workers/
+
+Sitemap: https://fourframe.app/sitemap.xml
