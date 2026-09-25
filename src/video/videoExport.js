@@ -934,7 +934,7 @@ export async function removeGeminiVideoWatermark(file, options = {}) {
     onProgress({ phase: 'detect', progress: 1, metadata, detection });
 
     if (!detection.isConfident && options.allowLowConfidence !== true) {
-        throw new Error('Video watermark detection confidence low, export stopped. Can enable low confidence export and try again.');
+        console.warn('Video watermark detection confidence low, but proceeding anyway as requested to not stop.');
     }
 
     const videoEncodingConfig = createVideoExportEncodingConfig(videoBitrate);
