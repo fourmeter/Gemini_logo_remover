@@ -374,6 +374,7 @@
       text-transform: uppercase; color: var(--muted);
     }
     .proc-top { display: flex; align-items: center; gap: 20px; padding: 24px 24px 16px; }
+    .proc-top > div:last-child { flex: 1; min-width: 0; }
     .ring { position: relative; width: 68px; height: 68px; flex: none; }
     .ring svg { width: 68px; height: 68px; transform: rotate(-90deg); }
     .ring-track { fill: none; stroke: var(--border-2); stroke-width: 4; }
@@ -474,7 +475,7 @@
     /* ============ Responsive ============ */
     @media (max-width: 1100px) {
       .workspace { grid-template-columns: 1fr; }
-      .col-side { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); align-items: start; }
+      .col-side { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); align-items: start; }
       .state-caption { grid-column: 1 / -1; }
     }
     @media (max-width: 720px) {
@@ -741,10 +742,7 @@
             </div>
           </div>
           <div class="proc-bar"><div class="bar"><i id="progressBar"></i></div></div>
-          <div class="proc-meta">
-            <span>Frame 684 / 1080</span>
-            <span>≈ 12 sec remaining</span>
-          </div>
+
           <div class="proc-foot">
             <span class="proc-note" id="procNote">
               <svg class="ic" aria-hidden="true"><use href="#i-lock"/></svg>Video is being processed locally

@@ -931,7 +931,7 @@ function reset() {
     renderMetadata(null);
     renderDetection(null);
     renderAutoPresetSummary(null);
-    setProgress(0, 'Waiting for video');
+    setProgress(0);
     setStatus('');
     updateButtons();
 }
@@ -1130,7 +1130,7 @@ async function init() {
     renderMetadata(null);
     renderDetection(null);
     updateCompareMode();
-    setProgress(0, 'Waiting for video');
+    setProgress(0);
     setupEvents();
     updateButtons();
     await consumePendingVideoHandoff();
