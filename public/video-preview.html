@@ -595,6 +595,27 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; }
 .drop.dragover .do-inner { background: rgba(110,155,255,0.1); border-color: var(--blue); }
 .drop .do-inner .ic { width: 30px; height: 30px; color: var(--blue); }
 
+
+
+/* ---------- enhanced ba-stage empty states & badges ---------- */
+#originalEmpty, #processedEmpty {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  background: var(--panel); font-family: 'Space Grotesk', sans-serif; font-size: 16px; color: var(--dim);
+}
+#originalEmpty { z-index: 30; }
+#processedEmpty { z-index: 25; }
+
+.ba-badge {
+    position: absolute; top: 12px; font: 500 10px "IBM Plex Mono"; letter-spacing: .14em;
+    padding: 6px 10px; border-radius: 6px; background: rgba(8,10,16,.74);
+    border: 1px solid var(--line2); pointer-events: none; backdrop-filter: blur(4px);
+    z-index: 20;
+}
+.badge-before { left: 12px; color: var(--amber); border-color: rgba(255,180,84,.4); }
+.badge-after { right: 12px; color: var(--mint); border-color: rgba(63,220,158,.4); }
+
+.cmp-handle { z-index: 21; }
+
 </style>
 </head>
 <body>
