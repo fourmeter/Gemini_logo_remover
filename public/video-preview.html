@@ -21,46 +21,46 @@
     /* ============ Tokens ============ */
     :root, :root[data-theme="light"] {
       color-scheme: light;
-      --bg: #F7F7F8;
+      --bg: #F8F9FC;
       --surface: #FFFFFF;
-      --surface-2: #F4F4F5;
-      --surface-3: #EDEDF0;
-      --text: #18181B;
-      --muted: #71717A;
-      --border: #E4E4E7;
-      --border-2: #D4D4D8;
-      --accent: #7C3AED;
-      --accent-2: #8B5CF6;
+      --surface-2: #F7F7FB;
+      --surface-3: #F1EEFF;
+      --text: #111827;
+      --muted: #64748B;
+      --border: #E5E7EB;
+      --border-2: #D1D5DB;
+      --accent: #6D5DFB;
+      --accent-2: #8B7CFF;
       --accent-ink: #FFFFFF;
-      --accent-soft: rgba(124, 58, 237, 0.10);
-      --green: #16A34A;
-      --green-bg: rgba(22, 163, 74, 0.10);
-      --green-bd: rgba(22, 163, 74, 0.25);
-      --red: #DC2626;
-      --red-bg: rgba(220, 38, 38, 0.10);
-      --red-bd: rgba(220, 38, 38, 0.25);
-      --cyan: #06B6D4;
-      --shadow: 0 20px 60px rgba(0,0,0,.35);
-      --shadow-sm: 0 4px 14px rgba(0,0,0,.22);
-      --font: "Inter", "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      --mono: "SF Mono", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
-      --radius-card: 18px;
+      --accent-soft: rgba(109, 93, 251, 0.10);
+      --green: #22C55E;
+      --green-bg: rgba(34, 197, 94, 0.10);
+      --green-bd: rgba(34, 197, 94, 0.25);
+      --red: #EF4444;
+      --red-bg: rgba(239, 68, 68, 0.10);
+      --red-bd: rgba(239, 68, 68, 0.25);
+      --cyan: #5B8DEF;
+      --shadow: 0 10px 40px rgba(0,0,0,.04);
+      --shadow-sm: 0 4px 14px rgba(0,0,0,.03);
+      --font: "Inter", "SF Pro Display", system-ui, -apple-system, sans-serif;
+      --mono: "SF Mono", "JetBrains Mono", ui-monospace, monospace;
+      --radius-card: 20px;
       --radius-btn: 12px;
     }
     :root[data-theme="dark"] {
       color-scheme: dark;
-      --bg: #09090B;
-      --surface: #111114;
-      --surface-2: #18181C;
-      --surface-3: #202025;
-      --text: #FAFAFA;
-      --muted: #A1A1AA;
-      --border: #27272A;
-      --border-2: #3F3F46;
-      --accent: #8B5CF6;
-      --accent-2: #A78BFA;
+      --bg: #0F1117;
+      --surface: #171A22;
+      --surface-2: #1E2230;
+      --surface-3: #222635;
+      --text: #F8FAFC;
+      --muted: #94A3B8;
+      --border: #2A2F3D;
+      --border-2: #363C4E;
+      --accent: #8B7CFF;
+      --accent-2: #6D5DFB;
       --accent-ink: #FFFFFF;
-      --accent-soft: rgba(139, 92, 246, 0.14);
+      --accent-soft: rgba(139, 124, 255, 0.15);
       --green: #22C55E;
       --green-bg: rgba(34, 197, 94, 0.10);
       --green-bd: rgba(34, 197, 94, 0.25);
@@ -93,7 +93,7 @@
     :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
     svg.ic { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
 
-    .shell { width: min(1280px, calc(100% - 48px)); margin: 0 auto; }
+    .shell { width: min(1440px, calc(100% - 64px)); margin: 0 auto; }
     .mono { font-family: var(--mono); }
 
     /* ============ Header ============ */
@@ -166,10 +166,10 @@
 
     /* ============ Workspace ============ */
     .workspace {
-      display: grid; grid-template-columns: minmax(0, 1fr) 460px;
+      display: grid; grid-template-columns: 240px 1fr 340px;
       gap: 32px; align-items: start; padding-bottom: 40px;
     }
-    .col-main, .col-side { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
+    .col-left, .col-center, .col-right { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
 
     .card {
       background: var(--surface);
@@ -497,18 +497,17 @@
     .foot-links i { font-style: normal; color: var(--border-2); }
 
     /* ============ Responsive ============ */
-    @media (max-width: 1100px) {
-      .workspace { grid-template-columns: 1fr; }
-      .col-side { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); align-items: start; }
-      .state-caption { grid-column: 1 / -1; }
+    @media (max-width: 1200px) {
+      .workspace { grid-template-columns: 240px 1fr; }
+      .col-right { grid-column: 1 / -1; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); }
     }
-    @media (max-width: 720px) {
+    @media (max-width: 860px) {
+      .workspace { grid-template-columns: 1fr; }
       .shell { width: calc(100% - 32px); }
       .nav { display: none; }
       .live-badge { display: none; }
       .hero { padding: 40px 0 32px; }
       .adv-body { grid-template-columns: 1fr; }
-      .rows > div { grid-template-columns: 120px 1fr; }
       .detect { flex-direction: column; }
     }
     @media (prefers-reduced-motion: reduce) {
@@ -637,8 +636,61 @@
 
     <!-- ============ Workspace ============ -->
     <section class="workspace">
-      <!-- LEFT: comparison -->
-      <div class="col-main">
+      
+      <!-- LEFT SIDEBAR -->
+      <aside class="col-left">
+        <article class="card">
+          <div class="card-head">
+            <h2 class="card-title"><svg class="ic" aria-hidden="true"><use href="#i-spark"/></svg>Workflow</h2>
+          </div>
+          <ol class="steps">
+            <!-- Step 1 -->
+            <li class="step done">
+              <span class="step-dot"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg></span>
+              <div>
+                <p class="step-title">Upload</p>
+                <p class="step-sub">File selected</p>
+              </div>
+            </li>
+            <!-- Step 2 -->
+            <li class="step current">
+              <span class="step-dot">2</span>
+              <div>
+                <p class="step-title">Detect</p>
+                <p class="step-sub">Finding watermark...</p>
+              </div>
+            </li>
+            <!-- Step 3 -->
+            <li class="step">
+              <span class="step-dot">3</span>
+              <div>
+                <p class="step-title">Clean</p>
+                <p class="step-sub">Ready to process</p>
+              </div>
+            </li>
+          </ol>
+          <div style="padding: 0 24px 24px;">
+            <div class="file-chip">
+              <svg class="ic" aria-hidden="true"><use href="#i-film"/></svg>
+              <b id="fileName">my_video.mp4</b>
+              <span id="fileMeta">1920 × 1080</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="card privacy-card" id="privacy">
+          <div class="privacy-in">
+            <span class="privacy-icon"><svg class="ic" aria-hidden="true"><use href="#i-shield"/></svg></span>
+            <div>
+              <h3>Your videos stay on your device.</h3>
+              <p>Processing happens locally in your browser. Your videos are never uploaded to a server.</p>
+            </div>
+          </div>
+        </article>
+      </aside>
+
+      <!-- CENTER CONTENT -->
+      <main class="col-center">
         <article class="card" id="compareCard">
           <div class="card-head">
             <h2 class="card-title"><svg class="ic" aria-hidden="true"><use href="#i-film"/></svg>Before / After</h2>
@@ -675,129 +727,28 @@
           </div>
         </article>
 
-        <details class="card" open>
-          <summary>
-            <span class="card-title"><svg class="ic" aria-hidden="true"><use href="#i-film"/></svg>Video Information</span>
-            <svg class="ic chev" aria-hidden="true"><use href="#i-chev"/></svg>
-          </summary>
-          <div id="metadata" class="rows">Waiting for video</div>
-        </details>
-      </div>
-
-      <!-- RIGHT: workflow -->
-      <div class="col-side">
-        <article class="card">
-          <div class="drop" id="dropzone" role="button" tabindex="0" aria-label="Upload a video">
-            <div class="drop-icon"><svg class="ic" aria-hidden="true"><use href="#i-upload"/></svg></div>
-            <h3>Drop your video or image here</h3>
-            <p class="fmt">MP4, MOV, WebM · up to 2 GB</p>
-            <button class="btn btn-tonal" type="button">
-              <svg class="ic" aria-hidden="true"><use href="#i-upload"/></svg>Choose File
-            </button>
-            <br>
-            <span class="privacy"><svg class="ic" aria-hidden="true"><use href="#i-lock"/></svg>Processed locally in your browser</span>
-            <input id="fileInput" type="file" accept="video/mp4,video/webm,video/quicktime,video/*,image/*" hidden>
-          </div>
-        </article>
-
+        <!-- Detection Information -->
         <article class="card">
           <div class="card-head">
-            <h2 class="card-title"><svg class="ic" aria-hidden="true"><use href="#i-spark"/></svg>Workflow</h2>
-            <span class="hint">3 steps · 100% local</span>
+            <h2 class="card-title">Watermark Detected</h2>
+            <span class="hint">Found automatically</span>
           </div>
-          <ol class="steps">
-            <!-- Step 1 -->
-            <li class="step done">
-              <span class="step-dot"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg></span>
-              <div>
-                <p class="step-title">Upload</p>
-                <div class="step-body">
-                  <div class="file-chip">
-                    <svg class="ic" aria-hidden="true"><use href="#i-film"/></svg>
-                    <b id="fileName">my_video_1080p.mp4</b>
-                    <span id="fileMeta">1920 × 1080 · 00:10 · 24 MB</span>
-                  </div>
-                </div>
-              </div>
-            </li>
-            <!-- Step 2 -->
-            <li class="step done">
-              <span class="step-dot"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg></span>
-              <div>
-                <p class="step-title">Watermark detected</p>
-                <p class="step-sub">Found automatically — no manual selection needed.</p>
-                <div class="step-body">
-                  <div class="detect" id="detection">Waiting for detection</div>
-                <div id="autoPresetSummary" style="margin-top: 10px; font-size: 13px;"></div>
-                <button id="detectBtn" class="btn btn-ghost btn-sm" type="button" disabled style="margin-top:10px;"><svg class="ic" aria-hidden="true"><use href="#i-refresh"/></svg>Detect Again</button>
-                </div>
-              </div>
-            </li>
-            <!-- Step 3 -->
-            <li class="step current">
-              <span class="step-dot">3</span>
-              <div>
-                <p class="step-title">Remove &amp; Export</p>
-                <p class="step-sub">Every frame is cleaned and re-encoded on your device.</p>
-                <div class="step-body cta-row">
-                  <button id="processBtn" class="btn btn-primary btn-lg" type="button" disabled>
-                    <svg class="ic" aria-hidden="true"><use href="#i-spark"/></svg>Remove Watermark &amp; Export
-                  </button>
-                  <button id="resetBtn" class="btn btn-ghost" type="button" disabled>Reset</button>
-                </div>
-              </div>
-            </li>
-          </ol>
-        </article>
-
-        <p class="state-caption">Processing state</p>
-        <article class="card" id="procCard">
-          <div class="proc-top">
-            <div class="ring" role="img" aria-label="Processing 63 percent">
-              <svg viewBox="0 0 64 64" aria-hidden="true">
-                <circle class="ring-track" cx="32" cy="32" r="26"/>
-                <circle class="ring-fill" cx="32" cy="32" r="26"/>
-              </svg>
-              <b id="progressText">0%</b>
-            </div>
-            <div>
-              <h3 id="status">Waiting...</h3>
-              <p id="procSub">Inpainting frames locally — nothing is uploaded.</p>
-            </div>
-          </div>
-          <div class="proc-bar"><div class="bar"><i id="progressBar"></i></div></div>
-
-          <div class="proc-foot">
-            <span class="proc-note" id="procNote">
-              <svg class="ic" aria-hidden="true"><use href="#i-lock"/></svg>Processing locally
-            </span>
-            <button id="cancelBtn" class="btn btn-danger btn-sm" type="button">
-              <svg class="ic" aria-hidden="true"><use href="#i-stop"/></svg>Stop Processing
-            </button>
+          <div style="padding: 20px 24px;">
+            <div class="detect" id="detection">Waiting for detection</div>
+            <div id="autoPresetSummary" style="margin-top: 10px; font-size: 13px;"></div>
+            <button id="detectBtn" class="btn btn-ghost btn-sm" type="button" disabled style="margin-top:10px;"><svg class="ic" aria-hidden="true"><use href="#i-refresh"/></svg>Detect Again</button>
           </div>
         </article>
 
-        <p class="state-caption">Result state</p>
-        <article class="card">
-          <div class="success">
-            <span class="success-icon"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg></span>
-            <h3>Your file is ready</h3>
-            <p>Watermark removed successfully.</p>
-            <div class="result-meta">
-              <div><span>File</span><b>my_video_1080p.mp4</b></div>
-              <div><span>Output</span><b>1920 × 1080 · H.264</b></div>
-              <div><span>Processing time</span><b>14.2 sec</b></div>
-            </div>
-            <a id="downloadBtn" class="btn btn-primary btn-lg" tabindex="-1" aria-disabled="true">
-              <svg class="ic" aria-hidden="true"><use href="#i-download"/></svg>Download File
-            </a>
-            <button class="btn btn-lg" type="button" onclick="document.getElementById('resetBtn').click()">
-              <svg class="ic" aria-hidden="true"><use href="#i-refresh"/></svg>Process Another File
-            </button>
-          </div>
-        </article>
+        <!-- Primary Action -->
+        <div style="display:flex; gap:12px; margin-top:8px;">
+          <button id="processBtn" class="btn btn-primary btn-lg" type="button" disabled style="flex:1;">
+            <svg class="ic" aria-hidden="true"><use href="#i-spark"/></svg>Remove Watermark &amp; Export
+          </button>
+          <button id="resetBtn" class="btn btn-ghost" type="button" disabled>Reset</button>
+        </div>
 
-        <details class="card">
+        <details class="card" style="margin-top: 24px;">
           <summary>
             <span class="card-title"><svg class="ic" aria-hidden="true"><use href="#i-sliders"/></svg>Advanced Settings</span>
             <svg class="ic chev" aria-hidden="true"><use href="#i-chev"/></svg>
@@ -835,20 +786,73 @@
               <label class="check"><input type="checkbox" id="highQualityCleanup" checked> High Quality Cleanup</label>
               <label class="check"><input type="checkbox" id="allowLowConfidence"> Allow Low Confidence</label>
             </div>
-</div>
+          </div>
         </details>
+      </main>
 
-        <article class="card privacy-card" id="privacy">
-          <div class="privacy-in">
-            <span class="privacy-icon"><svg class="ic" aria-hidden="true"><use href="#i-shield"/></svg></span>
-            <div>
-              <h3>Your privacy matters</h3>
-              <p>Everything happens locally in your browser. Your original video is never uploaded to a server.</p>
-              <span class="tech-chip"><svg class="ic" aria-hidden="true"><use href="#i-bolt"/></svg>WebCodecs + Mediabunny</span>
-            </div>
+      <!-- RIGHT SIDEBAR -->
+      <aside class="col-right">
+        
+        <!-- Upload Card -->
+        <article class="card" id="uploadCard">
+          <div class="drop" id="dropzone" role="button" tabindex="0" aria-label="Upload a video">
+            <div class="drop-icon"><svg class="ic" aria-hidden="true"><use href="#i-upload"/></svg></div>
+            <h3>Drop your video here</h3>
+            <p class="fmt">MP4, MOV, WebM · up to 2 GB</p>
+            <button class="btn btn-tonal" type="button">
+              <svg class="ic" aria-hidden="true"><use href="#i-upload"/></svg>Choose File
+            </button>
+            <br>
+            <span class="privacy"><svg class="ic" aria-hidden="true"><use href="#i-lock"/></svg>Processed locally</span>
+            <input id="fileInput" type="file" accept="video/mp4,video/webm,video/quicktime,video/*,image/*" hidden>
           </div>
         </article>
-      </div>
+
+        <article class="card" id="procCard">
+          <div class="proc-top">
+            <div class="ring" role="img" aria-label="Processing 63 percent">
+              <svg viewBox="0 0 64 64" aria-hidden="true">
+                <circle class="ring-track" cx="32" cy="32" r="26"/>
+                <circle class="ring-fill" cx="32" cy="32" r="26"/>
+              </svg>
+              <b id="progressText">0%</b>
+            </div>
+            <div>
+              <h3 id="status">Waiting...</h3>
+              <p id="procSub">Inpainting frames locally — nothing is uploaded.</p>
+            </div>
+          </div>
+          <div class="proc-bar"><div class="bar"><i id="progressBar"></i></div></div>
+          <div class="proc-foot">
+            <span class="proc-note" id="procNote">
+              <svg class="ic" aria-hidden="true"><use href="#i-lock"/></svg>Processing locally
+            </span>
+            <button id="cancelBtn" class="btn btn-danger btn-sm" type="button">
+              <svg class="ic" aria-hidden="true"><use href="#i-stop"/></svg>Stop Processing
+            </button>
+          </div>
+        </article>
+
+        <p class="state-caption">Result state</p>
+        <article class="card">
+          <div class="success">
+            <span class="success-icon"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg></span>
+            <h3>Your file is ready</h3>
+            <p>Watermark removed successfully.</p>
+            <div class="result-meta">
+              <div><span>File</span><b>my_video_1080p.mp4</b></div>
+              <div><span>Output</span><b>1920 × 1080 · H.264</b></div>
+              <div><span>Processing time</span><b>14.2 sec</b></div>
+            </div>
+            <a id="downloadBtn" class="btn btn-primary btn-lg" tabindex="-1" aria-disabled="true">
+              <svg class="ic" aria-hidden="true"><use href="#i-download"/></svg>Download File
+            </a>
+            <button class="btn btn-lg" type="button" onclick="document.getElementById('resetBtn').click()">
+              <svg class="ic" aria-hidden="true"><use href="#i-refresh"/></svg>Process Another File
+            </button>
+          </div>
+        </article>
+      </aside>
     </section>
   </main>
 
