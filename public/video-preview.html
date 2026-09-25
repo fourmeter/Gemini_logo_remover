@@ -597,28 +597,20 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; }
 
 
 /* ---------- enhanced ba-stage empty states & badges ---------- */
-#originalEmpty, #processedEmpty {
-  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+
+
+
+
+#originalEmpty {
+  position: absolute; left: 0; width: var(--pos, 50%); height: 100%;
+  display: flex; align-items: center; justify-content: center; text-align: center;
   background: var(--panel); font-family: 'Space Grotesk', sans-serif; font-size: 16px; color: var(--dim);
 }
-#originalEmpty { z-index: 30; }
-#processedEmpty { z-index: 25; }
-
-.ba-badge {
-    position: absolute; top: 12px; font: 500 10px "IBM Plex Mono"; letter-spacing: .14em;
-    padding: 6px 10px; border-radius: 6px; background: rgba(8,10,16,.74);
-    border: 1px solid var(--line2); pointer-events: none; backdrop-filter: blur(4px);
-    z-index: 20;
+#processedEmpty {
+  position: absolute; left: var(--pos, 50%); width: calc(100% - var(--pos, 50%)); height: 100%;
+  display: flex; align-items: center; justify-content: center; text-align: center;
+  background: var(--panel); font-family: 'Space Grotesk', sans-serif; font-size: 16px; color: var(--dim);
 }
-.badge-before { left: 12px; color: var(--amber); border-color: rgba(255,180,84,.4); }
-.badge-after { right: 12px; color: var(--mint); border-color: rgba(63,220,158,.4); }
-
-.cmp-handle { z-index: 21; }
-
-
-
-#originalEmpty { z-index: 999 !important; background: var(--panel) !important; }
-#processedEmpty { z-index: 998 !important; background: var(--panel) !important; }
 
 </style>
 </head>
@@ -809,15 +801,15 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; }
           <div class="ba-stage" id="baStage">
             <div class="ba-layer ba-after">
               <video id="processedVideo" class="frame" style="object-fit: contain; width: 100%; height: 100%; background: #000" hidden></video><img id="processedImage" class="frame" style="object-fit: contain; width: 100%; height: 100%; background: #000" hidden>
-              <span class="ba-badge badge-after" id="afterBadge">After</span>
+              <span class="ba-badge badge-after" id="afterBadge">After</span><div id="processedEmpty" class="empty-state">Your preview will appear here</div>
             </div>
             <div class="ba-layer ba-before">
               <video id="originalVideo" class="frame" style="object-fit: contain; width: 100%; height: 100%; background: #000" hidden></video><img id="originalImage" class="frame" style="object-fit: contain; width: 100%; height: 100%; background: #000" hidden>
-              <span class="ba-badge badge-before">Before</span>
+              <span class="ba-badge badge-before">Before</span><div id="originalEmpty" class="empty-state">Upload a video to begin</div>
             </div>
                         
-            <div id="processedEmpty" class="empty-state">Your preview will appear here</div>
-            <div id="originalEmpty" class="empty-state">Upload a video to begin</div>
+            
+            
             <div class="cmp-handle" id="baHandle" role="slider" tabindex="0" aria-label="Comparison divider" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" aria-orientation="horizontal">
               <i class="bar"></i>
               <span class="knob"><svg class="ic"><path d="m9.5 7-5 5 5 5M14.5 7l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
