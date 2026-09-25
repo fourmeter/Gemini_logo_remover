@@ -253,23 +253,22 @@
     }
     .badge-before { left: 16px; }
     .badge-after { right: 16px; }
-    .ba-divider {
-      position: absolute; top: 0; bottom: 0; left: var(--pos); z-index: 6;
-      width: 2px; transform: translateX(-1px);
-      background: var(--accent); pointer-events: none;
-      box-shadow: 0 0 0 1px rgba(0,0,0,.18), 0 0 14px var(--accent-soft);
-    }
-    .ba-handle {
-      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      width: 46px; height: 46px; border-radius: 50%;
-      background: var(--surface); color: var(--text);
-      border: 1px solid var(--accent);
-      box-shadow: 0 4px 16px rgba(0,0,0,.3);
-      display: grid; place-items: center; cursor: ew-resize;
-      transition: box-shadow .2s;
-    }
-    .ba-handle:hover { box-shadow: 0 6px 20px var(--accent-soft); }
-    .ba-handle:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+    .cmp-handle {
+  position: absolute; top: 0; bottom: 0; left: var(--pos, 50%);
+  width: 2px; background: transparent; z-index: 21; transform: translateX(-50%); cursor: ew-resize;
+}
+.cmp-handle .bar {
+  position: absolute; top: 0; bottom: 0; left: 0; width: 2px; background: var(--accent); pointer-events: none;
+}
+.cmp-handle .knob {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 40px; height: 40px; background: var(--panel); border: 1px solid var(--accent);
+  border-radius: 50%; display: grid; place-items: center; color: var(--text);
+  box-shadow: 0 2px 8px rgba(0,0,0,.4); transition: transform 0.2s, box-shadow 0.2s;
+}
+.cmp-handle:hover .knob { transform: translate(-50%, -50%) scale(1.05); box-shadow: 0 4px 12px rgba(0,0,0,.6); }
+.cmp-handle:active .knob { transform: translate(-50%, -50%) scale(0.95); }
+
 
     /* Detection overlay (SVG, theme-aware) */
     .bb { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 2.5; }
@@ -615,6 +614,11 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; }
 .badge-after { right: 12px; color: var(--mint); border-color: rgba(63,220,158,.4); }
 
 .cmp-handle { z-index: 21; }
+
+
+
+#originalEmpty { z-index: 999 !important; background: var(--panel) !important; }
+#processedEmpty { z-index: 998 !important; background: var(--panel) !important; }
 
 </style>
 </head>
