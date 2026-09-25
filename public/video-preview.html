@@ -760,66 +760,20 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; }
       <!-- LEFT SIDEBAR -->
       <aside class="col-left">
         <article class="card">
-          <div class="card-head">
-            <h2 class="card-title"><svg class="ic" aria-hidden="true"><use href="#i-spark"/></svg>Workflow</h2>
-          </div>
-          <ol class="steps">
-            <!-- Step 1 -->
-            <li class="step done">
-              <span class="step-dot"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg></span>
-              <div>
-                <p class="step-title">Upload</p>
-                <p class="step-sub">File selected</p>
-              </div>
-            </li>
-            <!-- Step 2 -->
-            <li class="step current">
-              <span class="step-dot">2</span>
-              <div>
-                <p class="step-title">Detect</p>
-                <p class="step-sub">Finding watermark...</p>
-              </div>
-            </li>
-            <!-- Step 3 -->
-            <li class="step">
-              <span class="step-dot">3</span>
-              <div>
-                <p class="step-title">Clean</p>
-                <p class="step-sub">Ready to process</p>
-              </div>
-            </li>
-          </ol>
-          <div style="padding: 0 24px 24px;">
-            <div class="file-chip">
-              <svg class="ic" aria-hidden="true" style="color: var(--accent);"><use href="#i-film"/></svg>
-              <div id="metadata" class="rows" style="font-size: 13px;">Waiting for video</div>
+          <div class="ba-head-lockup" style="padding: 24px 24px 0;">
+            <div class="ba-head" style="display:flex;align-items:center;gap:14px;font:500 11px 'IBM Plex Mono',monospace;letter-spacing:.2em;color:var(--dim);text-transform:uppercase;">
+              <b style="color:var(--blue);font-weight:600;">02</b><span>/</span><span>Comparison</span><i class="rule" style="flex:1;height:1px;background:var(--line2);"></i>
             </div>
-          </div>
-        </article>
-
-        <article class="card privacy-card" id="privacy">
-          <div class="privacy-in">
-            <span class="privacy-icon"><svg class="ic" aria-hidden="true"><use href="#i-shield"/></svg></span>
-            <div>
-              <h3>Your videos stay on your device.</h3>
-              <p>Processing happens locally in your browser. Your videos are never uploaded to a server.</p>
-            </div>
-          </div>
-        </article>
-      </aside>
-
-      <!-- CENTER CONTENT -->
-      <main class="col-center">
-        <article class="card" id="compareCard">
-          <div class="card-head">
-            <h2 class="card-title"><svg class="ic" aria-hidden="true"><use href="#i-film"/></svg>Before / After</h2>
-            <span class="hint">
-  <svg class="ic-drag-anim" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <path class="arrow-l" d="m10 8-4 4 4 4"/><path class="arrow-r" d="m14 8 4 4-4 4"/>
-    <line x1="12" y1="4" x2="12" y2="20" stroke-opacity="0.3"/>
-  </svg>
-  Drag to compare
-</span>
+            <h2 class="ba-title" style="margin:18px 0 12px;font-size:clamp(1.6rem,2vw,2rem);font-weight:600;letter-spacing:-.02em;">Watermarked → <span class="clean" style="color:var(--mint);">Clean</span></h2>
+            <p class="ba-sub" style="color:var(--muted);font-size:15px;margin-bottom:24px;display:flex;align-items:center;gap:12px;">
+              <span class="hint">
+                <svg class="ic-drag-anim" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path class="arrow-l" d="m10 8-4 4 4 4"/><path class="arrow-r" d="m14 8 4 4-4 4"/>
+                  <line x1="12" y1="4" x2="12" y2="20" stroke-opacity="0.3"/>
+                </svg>
+                Drag to compare
+              </span>
+            </p>
           </div>
           <div class="ba-stage" id="baStage">
             <div class="ba-layer ba-after">
