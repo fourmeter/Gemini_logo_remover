@@ -194,7 +194,24 @@
     }
     .card-title { margin: 0; font-size: 16px; font-weight: 600; letter-spacing: -0.01em; display: inline-flex; align-items: center; gap: 12px; }
     .card-title .ic { width: 18px; height: 18px; color: var(--accent); }
-    .hint { font: 500 11px 'IBM Plex Mono', monospace; letter-spacing: 0.1em; color: var(--dim); text-transform: uppercase; background: rgba(255, 255, 255, 0.03); padding: 6px 12px; border-radius: 20px; border: 1px solid var(--line2); backdrop-filter: blur(4px); }
+    .hint {
+  display: inline-flex; align-items: center; gap: 8px;
+  font: 500 11px 'IBM Plex Mono', monospace; letter-spacing: 0.1em; color: var(--dim);
+  text-transform: uppercase; background: rgba(255, 255, 255, 0.03);
+  padding: 4px 12px 4px 6px; border-radius: 20px; border: 1px solid var(--line2);
+  backdrop-filter: blur(4px);
+}
+.ic-drag-anim { width: 16px; height: 16px; color: var(--accent); }
+.ic-drag-anim .arrow-l { animation: slideLeft 1.5s infinite ease-in-out; }
+.ic-drag-anim .arrow-r { animation: slideRight 1.5s infinite ease-in-out; }
+@keyframes slideLeft {
+  0%, 100% { transform: translateX(0); opacity: 0.4; }
+  50% { transform: translateX(-2.5px); opacity: 1; }
+}
+@keyframes slideRight {
+  0%, 100% { transform: translateX(0); opacity: 0.4; }
+  50% { transform: translateX(2.5px); opacity: 1; }
+}
 
     /* ============ Buttons ============ */
     .btn {
@@ -796,7 +813,13 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; }
         <article class="card" id="compareCard">
           <div class="card-head">
             <h2 class="card-title"><svg class="ic" aria-hidden="true"><use href="#i-film"/></svg>Before / After</h2>
-            <span class="hint">Drag the handle to compare</span>
+            <span class="hint">
+  <svg class="ic-drag-anim" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path class="arrow-l" d="m10 8-4 4 4 4"/><path class="arrow-r" d="m14 8 4 4-4 4"/>
+    <line x1="12" y1="4" x2="12" y2="20" stroke-opacity="0.3"/>
+  </svg>
+  Drag to compare
+</span>
           </div>
           <div class="ba-stage" id="baStage">
             <div class="ba-layer ba-after">
