@@ -588,6 +588,13 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; }
 .cmp-handle:focus-visible .knob{outline:2px solid var(--blue);outline-offset:2px}
 .knob .ic{width:16px;height:16px}
 
+
+
+.drop .do-inner { border: 1.5px dashed var(--line2); border-radius: 14px; padding: 52px 68px; text-align: center; transition: background 0.2s, border-color 0.2s; cursor: pointer; }
+.drop .do-inner:hover { background: rgba(255,255,255,0.02); border-color: var(--blue); }
+.drop.dragover .do-inner { background: rgba(110,155,255,0.1); border-color: var(--blue); }
+.drop .do-inner .ic { width: 30px; height: 30px; color: var(--blue); }
+
 </style>
 </head>
 <body>
@@ -870,12 +877,11 @@ h1, h2, h3, h4, h5, h6 { font-weight: 600; }
         <!-- Upload Card -->
         <article class="card" id="uploadCard">
           <div class="drop" id="dropzone" role="button" tabindex="0" aria-label="Upload a video or image">
-            <div class="drop-icon"><svg class="ic" aria-hidden="true"><use href="#i-upload"/></svg></div>
-            <h3>Drop your video or image here</h3>
-            <p class="fmt">MP4, MOV, WebM, PNG, JPG · up to 2 GB</p>
-            <button class="btn btn-tonal" type="button">
-              <svg class="ic" aria-hidden="true"><use href="#i-upload"/></svg>Choose File
-            </button>
+            <div class="do-inner">
+              <svg class="ic"><use href="#i-upload"/></svg>
+              <p style="font:600 15px 'Space Grotesk';letter-spacing:.16em;margin-top:14px;">RELEASE TO LOAD MEDIA</p>
+              <span style="display:block;margin-top:9px;font:400 11px 'IBM Plex Mono';letter-spacing:.1em;color:var(--dim);">MP4 · MOV · PNG · JPG — MAX 2 GB</span>
+            </div>
             <br>
             <span class="privacy"><svg class="ic" aria-hidden="true"><use href="#i-lock"/></svg>Processed locally</span>
             <input id="fileInput" type="file" accept="video/mp4,video/webm,video/quicktime,video/*,image/*" hidden>
