@@ -1,137 +1,864 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gemini Watermark Remover</title>
-    <style>
-        body { font-family: sans-serif; max-width: 1200px; margin: 0 auto; padding: 20px; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .video-box { border: 1px solid #ccc; padding: 10px; min-height: 300px; display: flex; align-items: center; justify-content: center; background: #eee; }
-        video, img { max-width: 100%; max-height: 100%; }
-        .controls { margin-top: 20px; padding: 15px; background: #f9f9f9; border: 1px solid #ddd; }
-        .control-group { margin-bottom: 10px; }
-        #dropzone { border: 2px dashed #999; padding: 20px; text-align: center; margin-bottom: 20px; cursor: pointer; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#f6f2ea">
+  <title>Logo Remover ??? Remove Video Watermarks, Privately</title>
+  <script>
+    /* Apply saved theme before paint (no flash) */
+    (function () {
+      try {
+        var t = localStorage.getItem('lr-theme');
+        if (t !== 'light' && t !== 'dark') {
+          t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {}
+    })();
+  </script>
+  <style>
+    /* ============ Tokens ============ */
+    :root, :root[data-theme="light"] {
+      color-scheme: light;
+      --bg: #f6f2ea;
+      --surface: #fffdf8;
+      --surface-2: #f0e9dc;
+      --text: #241f18;
+      --muted: #6f6656;
+      --border: #e8e0d0;
+      --border-2: #d9cfba;
+      --accent: #e05d15;
+      --accent-2: #c74f0d;
+      --accent-ink: #ffffff;
+      --accent-soft: rgba(224, 93, 21, 0.10);
+      --green: #25714a;
+      --green-bg: #e8f2ea;
+      --green-bd: #c2d8c8;
+      --red: #b3372a;
+      --red-bg: #f9ecea;
+      --red-bd: #e2c3bd;
+      --shadow: 0 1px 2px rgba(35, 28, 18, 0.04), 0 12px 32px -16px rgba(35, 28, 18, 0.16);
+      --shadow-sm: 0 1px 2px rgba(35, 28, 18, 0.08);
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+      --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #16120d;
+      --surface: #1f1a14;
+      --surface-2: #2a231a;
+      --text: #efe9df;
+      --muted: #a79c8c;
+      --border: #322a20;
+      --border-2: #463b2c;
+      --accent: #f08036;
+      --accent-2: #fb9350;
+      --accent-ink: #221102;
+      --accent-soft: rgba(240, 128, 54, 0.14);
+      --green: #86c9a1;
+      --green-bg: #1c2a20;
+      --green-bd: #2f4a39;
+      --red: #e28577;
+      --red-bg: #2c1d19;
+      --red-bd: #553028;
+      --shadow: 0 1px 0 rgba(255,255,255,.02) inset, 0 12px 32px -16px rgba(0, 0, 0, 0.55);
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
+    }
+
+    /* ============ Base ============ */
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 15px;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+      -webkit-tap-highlight-color: transparent;
+    }
+    [hidden] { display: none !important; }
+    ::selection { background: var(--accent-soft); }
+    button, input, select { font: inherit; color: inherit; }
+    button { cursor: pointer; }
+    a { color: inherit; }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+    svg.ic { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+
+    .shell { width: min(1280px, calc(100% - 48px)); margin: 0 auto; }
+    .mono { font-family: var(--mono); }
+
+    /* ============ Header ============ */
+    .topbar {
+      position: sticky; top: 0; z-index: 50;
+      background: var(--bg);
+      background: color-mix(in srgb, var(--bg) 86%, transparent);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+    }
+    .topbar-in { height: 64px; display: flex; align-items: center; gap: 24px; }
+    .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .brand-mark {
+      width: 34px; height: 34px; border-radius: 10px;
+      background: var(--accent); color: var(--accent-ink);
+      display: grid; place-items: center;
+      box-shadow: var(--shadow-sm);
+    }
+    .brand-name { font-size: 15.5px; font-weight: 700; letter-spacing: -0.01em; }
+    .nav { display: flex; gap: 24px; margin-left: 16px; }
+    .nav a { font-size: 13.5px; font-weight: 550; color: var(--muted); text-decoration: none; transition: color .15s; }
+    .nav a:hover { color: var(--text); }
+    .top-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+    .live-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      height: 30px; padding: 0 12px; border-radius: 999px;
+      background: var(--green-bg); border: 1px solid var(--green-bd);
+      color: var(--green); font-size: 12px; font-weight: 650;
+    }
+    .live-badge .dot {
+      width: 8px; height: 8px; border-radius: 50%; background: var(--green);
+      animation: pulse 2.2s ease-out infinite;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--green) 45%, transparent); }
+      70% { box-shadow: 0 0 0 7px transparent; }
+      100% { box-shadow: 0 0 0 0 transparent; }
+    }
+    .theme-toggle {
+      width: 36px; height: 36px; padding: 0; border-radius: 10px;
+      border: 1px solid var(--border-2); background: var(--surface); color: var(--muted);
+      display: grid; place-items: center; transition: color .15s, border-color .15s;
+    }
+    .theme-toggle:hover { color: var(--accent); border-color: var(--muted); }
+    .theme-toggle .ic { width: 17px; height: 17px; }
+    .theme-toggle .icon-sun { display: none; }
+    :root[data-theme="dark"] .theme-toggle .icon-sun { display: block; }
+    :root[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
+
+    /* ============ Hero ============ */
+    .hero { text-align: center; padding: 56px 0 40px; }
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(2rem, 4.2vw, 2.75rem);
+      font-weight: 800; letter-spacing: -0.025em; line-height: 1.12;
+    }
+    .hero h1 .accent-word { color: var(--accent); }
+    .hero .sub { margin: 16px auto 0; max-width: 620px; color: var(--muted); font-size: 16px; }
+    .trust { list-style: none; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; padding: 0; margin: 28px 0 0; }
+    .trust li {
+      display: inline-flex; align-items: center; gap: 8px;
+      height: 36px; padding: 0 14px; border-radius: 999px;
+      background: var(--surface); border: 1px solid var(--border);
+      font-size: 13px; font-weight: 600; box-shadow: var(--shadow-sm);
+    }
+    .trust .ic { width: 15px; height: 15px; color: var(--accent); }
+
+    /* ============ Workspace ============ */
+    .workspace {
+      display: grid; grid-template-columns: minmax(0, 1fr) 440px;
+      gap: 24px; align-items: start; padding-bottom: 24px;
+    }
+    .col-main, .col-side { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .card-head {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      padding: 16px 24px; border-bottom: 1px solid var(--border);
+    }
+    .card-title { margin: 0; font-size: 15px; font-weight: 700; letter-spacing: -0.01em; display: inline-flex; align-items: center; gap: 10px; }
+    .card-title .ic { width: 17px; height: 17px; color: var(--accent); }
+    .hint { font-family: var(--mono); font-size: 11.5px; color: var(--muted); }
+
+    /* ============ Buttons ============ */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      height: 40px; padding: 0 16px; border-radius: 10px;
+      border: 1px solid var(--border-2); background: var(--surface); color: var(--text);
+      font-size: 14px; font-weight: 600; text-decoration: none; white-space: nowrap;
+      box-shadow: var(--shadow-sm);
+      transition: background .15s, border-color .15s, color .15s, transform .08s, box-shadow .15s;
+    }
+    .btn:hover { background: var(--surface-2); border-color: var(--muted); }
+    .btn:active { transform: translateY(1px); }
+    .btn .ic { width: 16px; height: 16px; }
+    .btn-primary {
+      background: var(--accent); border-color: var(--accent); color: var(--accent-ink);
+      box-shadow: 0 1px 2px rgba(0,0,0,.14), 0 8px 20px -10px var(--accent);
+    }
+    .btn-primary:hover { background: var(--accent-2); border-color: var(--accent-2); }
+    .btn-tonal { background: var(--accent-soft); border-color: transparent; color: var(--accent); box-shadow: none; }
+    .btn-tonal:hover { background: var(--accent-soft); border-color: var(--accent); }
+    .btn-ghost { background: transparent; border-color: transparent; color: var(--muted); box-shadow: none; }
+    .btn-ghost:hover { background: var(--surface-2); border-color: transparent; color: var(--text); }
+    .btn-danger { color: var(--red); border-color: var(--border-2); background: transparent; box-shadow: none; }
+    .btn-danger:hover { background: var(--red-bg); border-color: var(--red-bd); }
+    .btn-lg { width: 100%; height: 48px; font-size: 15px; border-radius: 12px; }
+    .btn-sm { height: 34px; padding: 0 12px; font-size: 13px; border-radius: 8px; }
+    .btn-sm .ic { width: 14px; height: 14px; }
+    .is-busy .ic { animation: spin .9s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ============ Compare player ============ */
+    .ba-stage {
+      position: relative; aspect-ratio: 16 / 9;
+      background: #0d0c0a; cursor: ew-resize; touch-action: none;
+      --pos: 50%;
+    }
+    .ba-layer { position: absolute; inset: 0; }
+    .ba-layer svg.frame, .ba-layer .frame { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+    .ba-before { z-index: 2; clip-path: inset(0 calc(100% - var(--pos)) 0 0); }
+    .ba-after { z-index: 1; }
+    .ba-badge {
+      position: absolute; top: 16px; z-index: 5; pointer-events: none;
+      font-family: var(--mono); font-size: 11px; font-weight: 700;
+      letter-spacing: .14em; padding: 6px 11px; border-radius: 999px;
+      background: rgba(14, 11, 8, .55); color: #fff;
+      border: 1px solid rgba(255, 255, 255, .18);
+      backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    }
+    .badge-before { left: 16px; }
+    .badge-after { right: 16px; }
+    .ba-divider {
+      position: absolute; top: 0; bottom: 0; left: var(--pos); z-index: 6;
+      width: 2px; transform: translateX(-1px);
+      background: #fff; pointer-events: none;
+      box-shadow: 0 0 0 1px rgba(0,0,0,.18), 0 0 14px rgba(0,0,0,.3);
+    }
+    .ba-handle {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      width: 44px; height: 44px; border-radius: 50%;
+      background: #fff; color: #38321f;
+      border: 1px solid rgba(0,0,0,.1);
+      box-shadow: 0 4px 16px rgba(0,0,0,.3);
+      display: grid; place-items: center; cursor: ew-resize;
+    }
+    .ba-handle:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+    /* Detection overlay (SVG, theme-aware) */
+    .bb { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 2.5; }
+    .bb-h { fill: var(--accent); stroke: #fff; stroke-width: 1.5; }
+    .bb-chip rect { fill: var(--accent); }
+    .bb-chip text { fill: #fff; font-size: 14px; font-weight: 650; font-family: var(--font); }
+    .wm { filter: drop-shadow(0 2px 6px rgba(0,0,0,.38)); }
+    .wm path { fill: #fff; opacity: .9; }
+    .wm text { fill: #fff; opacity: .93; font-size: 50px; font-weight: 650; font-family: var(--font); letter-spacing: .5px; }
+
+    /* Player bar */
+    .player-bar {
+      display: flex; align-items: center; gap: 14px;
+      padding: 12px 16px; background: var(--surface); border-top: 1px solid var(--border);
+    }
+    .icon-btn {
+      width: 38px; height: 38px; padding: 0; border-radius: 50%;
+      border: 1px solid var(--border-2); background: var(--surface); color: var(--text);
+      display: grid; place-items: center; transition: border-color .15s, color .15s;
+    }
+    .icon-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .icon-btn .ic { width: 16px; height: 16px; }
+    #playBtn .ic-pause { display: none; }
+    #playBtn[data-playing="true"] .ic-pause { display: block; }
+    #playBtn[data-playing="true"] .ic-play { display: none; }
+    .scrub {
+      -webkit-appearance: none; appearance: none;
+      flex: 1; height: 6px; border-radius: 999px; border: none; cursor: pointer;
+      background: linear-gradient(to right, var(--accent) var(--fill, 40%), var(--border-2) var(--fill, 40%));
+    }
+    .scrub::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%;
+      background: var(--surface); border: 3px solid var(--accent);
+      box-shadow: 0 1px 4px rgba(0,0,0,.3);
+    }
+    .scrub::-moz-range-thumb {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--surface); border: 3px solid var(--accent);
+      box-shadow: 0 1px 4px rgba(0,0,0,.3);
+    }
+    .time { font-size: 12.5px; color: var(--muted); min-width: 92px; text-align: right; font-variant-numeric: tabular-nums; }
+
+    /* ============ Info / details cards ============ */
+    details.card > summary {
+      list-style: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      padding: 16px 24px; font-size: 15px; font-weight: 700;
+    }
+    details.card > summary::-webkit-details-marker { display: none; }
+    details.card > summary .chev { transition: transform .2s; color: var(--muted); }
+    details.card[open] > summary .chev { transform: rotate(180deg); }
+    details.card[open] > summary { border-bottom: 1px solid var(--border); }
+
+    .rows { margin: 0; padding: 4px 0 8px; }
+    .rows > div {
+      display: grid; grid-template-columns: 150px 1fr; gap: 16px; align-items: center;
+      padding: 11px 24px; border-top: 1px solid var(--border); font-size: 13.5px;
+    }
+    .rows > div:first-child { border-top: none; }
+    .rows dt { color: var(--muted); font-weight: 500; }
+    .rows dd { margin: 0; font-family: var(--mono); font-size: 13px; font-variant-numeric: tabular-nums; }
+
+    /* ============ Upload card ============ */
+    .drop {
+      margin: 20px; padding: 36px 24px; text-align: center;
+      border: 2px dashed var(--border-2); border-radius: 14px;
+      transition: border-color .2s, background .2s; cursor: pointer;
+    }
+    .drop:hover, .drop.dragging { border-color: var(--accent); background: var(--accent-soft); }
+    .drop-icon {
+      width: 56px; height: 56px; margin: 0 auto 14px; border-radius: 50%;
+      background: var(--accent-soft); color: var(--accent);
+      display: grid; place-items: center;
+    }
+    .drop-icon .ic { width: 24px; height: 24px; }
+    .drop h3 { margin: 0; font-size: 16px; font-weight: 700; }
+    .drop .fmt { margin: 6px 0 18px; color: var(--muted); font-size: 13px; }
+    .drop .privacy {
+      display: inline-flex; align-items: center; gap: 6px;
+      margin: 14px 0 0; color: var(--muted); font-size: 12.5px;
+    }
+    .drop .privacy .ic { width: 13px; height: 13px; color: var(--green); }
+
+    /* ============ Workflow steps ============ */
+    .steps { list-style: none; margin: 0; padding: 20px 24px 24px; }
+    .step { position: relative; display: grid; grid-template-columns: 32px 1fr; gap: 14px; padding-bottom: 26px; }
+    .step:last-child { padding-bottom: 0; }
+    .step::before {
+      content: ""; position: absolute; left: 15px; top: 34px; bottom: 2px;
+      width: 2px; background: var(--border);
+    }
+    .step:last-child::before { display: none; }
+    .step-dot {
+      width: 32px; height: 32px; border-radius: 50%; z-index: 1;
+      display: grid; place-items: center;
+      font-size: 13px; font-weight: 700;
+      background: var(--surface); border: 1px solid var(--border-2); color: var(--muted);
+    }
+    .step-dot .ic { width: 15px; height: 15px; }
+    .step.done .step-dot { background: var(--green); border-color: var(--green); color: #fff; }
+    :root[data-theme="dark"] .step.done .step-dot { color: #10241a; }
+    .step.current .step-dot { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); box-shadow: 0 0 0 4px var(--accent-soft); }
+    .step-title { font-size: 14.5px; font-weight: 700; margin: 5px 0 2px; }
+    .step.done .step-title { color: var(--green); }
+    .step-sub { font-size: 13px; color: var(--muted); margin: 0; }
+    .step-body { margin-top: 12px; display: grid; gap: 10px; }
+
+    .file-chip {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px; border: 1px solid var(--border); border-radius: 10px;
+      background: var(--surface-2);
+    }
+    .file-chip .ic { width: 16px; height: 16px; color: var(--accent); }
+    .file-chip b { font-size: 13.5px; font-weight: 650; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .file-chip span { margin-left: auto; font-family: var(--mono); font-size: 12px; color: var(--muted); white-space: nowrap; }
+
+    .detect { display: flex; gap: 14px; align-items: flex-start; }
+    .thumb { flex: none; border-radius: 10px; border: 1px solid var(--border-2); display: block; width: 132px; height: auto; }
+    .detect-info { flex: 1; display: grid; gap: 6px; font-size: 13px; align-content: start; }
+    .detect-info > div { display: flex; justify-content: space-between; gap: 12px; }
+    .detect-info dt { color: var(--muted); }
+    .detect-info dd { margin: 0; font-family: var(--mono); font-size: 12.5px; }
+    .conf { color: var(--green); font-weight: 700; }
+    .detect-actions { margin-top: 2px; }
+
+    .cta-row { display: grid; gap: 10px; }
+
+    /* ============ Processing card ============ */
+    .state-caption {
+      margin: 4px 4px -12px; font-family: var(--mono);
+      font-size: 11px; font-weight: 600; letter-spacing: .14em;
+      text-transform: uppercase; color: var(--muted);
+    }
+    .proc-top { display: flex; align-items: center; gap: 16px; padding: 20px 24px 14px; }
+    .ring { position: relative; width: 64px; height: 64px; flex: none; }
+    .ring svg { width: 64px; height: 64px; transform: rotate(-90deg); }
+    .ring-track { fill: none; stroke: var(--border-2); stroke-width: 5; }
+    .ring-fill { fill: none; stroke: var(--accent); stroke-width: 5; stroke-linecap: round; stroke-dasharray: 163.4; stroke-dashoffset: 60.4; transition: stroke .3s; }
+    .ring b { position: absolute; inset: 0; display: grid; place-items: center; font-size: 13.5px; font-weight: 750; }
+    .proc-top h3 { margin: 0; font-size: 15px; font-weight: 700; }
+    .proc-top p { margin: 3px 0 0; font-size: 13px; color: var(--muted); }
+    .proc-bar { padding: 0 24px; }
+    .bar { height: 8px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--border); overflow: hidden; }
+    .bar > i { display: block; height: 100%; width: 63%; border-radius: inherit; background: var(--accent); transition: background .3s; }
+    .proc-meta {
+      display: flex; justify-content: space-between; gap: 12px;
+      padding: 10px 24px 0; font-family: var(--mono); font-size: 12px; color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+    .proc-foot { display: flex; align-items: center; gap: 10px; padding: 16px 24px 20px; }
+    .proc-note { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--muted); margin-right: auto; }
+    .proc-note .ic { width: 13px; height: 13px; color: var(--green); }
+    .is-stopped .ring-fill, .is-stopped .bar > i { background: var(--muted); stroke: var(--muted); }
+
+    /* ============ Success card ============ */
+    .success { padding: 24px; display: grid; gap: 14px; justify-items: start; }
+    .success-icon {
+      width: 52px; height: 52px; border-radius: 50%;
+      background: var(--green-bg); border: 1px solid var(--green-bd); color: var(--green);
+      display: grid; place-items: center;
+    }
+    .success-icon .ic { width: 26px; height: 26px; stroke-width: 2.2; }
+    .success h3 { margin: 0; font-size: 18px; font-weight: 750; letter-spacing: -0.01em; }
+    .success > p { margin: -6px 0 0; font-size: 13.5px; color: var(--muted); }
+    .result-meta { width: 100%; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+    .result-meta > div {
+      display: flex; justify-content: space-between; align-items: center; gap: 12px;
+      padding: 9px 14px; border-top: 1px solid var(--border); font-size: 13px;
+    }
+    .result-meta > div:first-child { border-top: none; }
+    .result-meta span { color: var(--muted); }
+    .result-meta b { font-family: var(--mono); font-size: 12.5px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .success .btn-lg + .btn-lg { margin-top: -4px; }
+
+    /* ============ Advanced settings ============ */
+    .adv-body { padding: 20px 24px 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 18px 20px; }
+    .field label { display: flex; justify-content: space-between; align-items: baseline; font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+    .field label output { font-family: var(--mono); font-size: 12px; color: var(--muted); font-weight: 500; }
+    .adv-body select {
+      width: 100%; height: 36px; padding: 0 10px; font-size: 13px;
+      border-radius: 8px; border: 1px solid var(--border-2);
+      background: var(--surface); color: var(--text);
+    }
+    .adv-body input[type="range"] {
+      -webkit-appearance: none; appearance: none; width: 100%; height: 5px;
+      border-radius: 999px; border: none; cursor: pointer;
+      background: linear-gradient(to right, var(--accent) var(--fill, 50%), var(--border-2) var(--fill, 50%));
+    }
+    .adv-body input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%;
+      background: var(--accent); border: 2px solid var(--surface);
+      box-shadow: 0 1px 3px rgba(0,0,0,.25);
+    }
+    .adv-body input[type="range"]::-moz-range-thumb {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--accent); border: 2px solid var(--surface);
+    }
+    .checks { grid-column: 1 / -1; display: grid; gap: 10px; border-top: 1px solid var(--border); padding-top: 16px; }
+    .check { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 500; cursor: pointer; }
+    .check input { width: 15px; height: 15px; accent-color: var(--accent); margin: 0; cursor: pointer; }
+    .check em { font-style: normal; color: var(--muted); font-size: 12px; }
+
+    /* ============ Privacy card ============ */
+    .privacy-card { background: var(--surface-2); }
+    .privacy-in { padding: 20px 24px; display: flex; gap: 14px; }
+    .privacy-icon {
+      width: 40px; height: 40px; flex: none; border-radius: 50%;
+      background: var(--green-bg); border: 1px solid var(--green-bd); color: var(--green);
+      display: grid; place-items: center;
+    }
+    .privacy-in h3 { margin: 2px 0 4px; font-size: 14.5px; font-weight: 700; }
+    .privacy-in p { margin: 0; font-size: 13px; color: var(--muted); }
+    .tech-chip {
+      display: inline-flex; align-items: center; gap: 7px;
+      margin-top: 12px; height: 26px; padding: 0 11px; border-radius: 999px;
+      border: 1px solid var(--border-2); background: var(--surface);
+      font-family: var(--mono); font-size: 11px; font-weight: 600; color: var(--muted);
+    }
+    .tech-chip .ic { width: 12px; height: 12px; color: var(--accent); }
+
+    /* ============ Footer ============ */
+    footer { border-top: 1px solid var(--border); margin-top: 32px; }
+    .foot-in {
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      padding: 22px 0 34px; color: var(--muted); font-size: 13px; flex-wrap: wrap;
+    }
+    .foot-links { display: flex; gap: 8px; align-items: center; }
+    .foot-links a { color: var(--muted); text-decoration: none; font-weight: 550; }
+    .foot-links a:hover { color: var(--text); }
+    .foot-links i { font-style: normal; color: var(--border-2); }
+
+    /* ============ Responsive ============ */
+    @media (max-width: 1100px) {
+      .workspace { grid-template-columns: 1fr; }
+      .col-side { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); align-items: start; }
+      .state-caption { grid-column: 1 / -1; }
+    }
+    @media (max-width: 720px) {
+      .shell { width: calc(100% - 32px); }
+      .nav { display: none; }
+      .live-badge { display: none; }
+      .hero { padding: 40px 0 32px; }
+      .adv-body { grid-template-columns: 1fr; }
+      .rows > div { grid-template-columns: 120px 1fr; }
+      .detect { flex-direction: column; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+    }
+  </style>
 </head>
 <body>
-    <h1>Gemini Video Watermark Remover</h1>
-    
-    <div id="dropzone">
-        <p>Drop video here or click to select</p>
-        <input type="file" id="fileInput" accept="video/*,image/*" style="display: none;">
-    </div>
-    
-    <div class="grid" id="comparePlayer">
-        <div>
-            <h3>Original</h3>
-            <div class="video-box">
-                <span id="originalEmpty">No video selected</span>
-                <video id="originalVideo" controls hidden></video>
-                <img id="originalImage" hidden>
-            </div>
-        </div>
-        <div>
-            <h3>Processed <span id="afterBadge" hidden>(AI Cleaned)</span></h3>
-            <div class="video-box">
-                <span id="processedEmpty">Processing will appear here</span>
-                <video id="processedVideo" controls hidden></video>
-                <img id="processedImage" hidden>
-            </div>
-        </div>
-    </div>
-    
-    <div class="controls">
-        <div class="control-group">
-            <button id="playPauseBtn" disabled>Play</button>
-            <input type="range" id="scrubber" min="0" max="1000" value="0" disabled style="width: 300px;">
-            <span id="timeLabel">0:00</span>
-        </div>
-        
-        <div class="control-group">
-            <button id="detectBtn" disabled>Detect Watermark</button>
-            <button id="processBtn" disabled>Export & Remove Watermark</button>
-            <a id="downloadBtn" tabindex="-1" aria-disabled="true">Download</a>
-            <button id="resetBtn" disabled>Reset</button>
-            <button id="cancelBtn" disabled>Cancel</button>
-            <button id="relocatedReviewPresetBtn" hidden>Relocated Review Preset</button>
-        </div>
-        
-        <div class="control-group">
-            <div style="margin-bottom: 5px;"><strong>Status:</strong> <span id="status">Waiting for input...</span></div>
-            <div style="width: 100%; background: #ddd; height: 10px; border-radius: 5px;">
-                <div id="progressBar" style="width: 0%; background: #007bff; height: 100%; border-radius: 5px;"></div>
-            </div>
-            <div id="progressText" style="font-size: 12px; margin-top: 2px;">0%</div>
-        </div>
-    </div>
-    
-    <div class="grid" style="margin-top: 20px;">
-        <div class="controls">
-            <h3>Detection Info</h3>
-            <div id="metadata"></div>
-            <div id="detection"></div>
-            <div id="autoPresetSummary"></div>
-        </div>
-        
-        <div class="controls">
-            <h3>Advanced Settings</h3>
-            <div class="control-group">
-                <label>Alpha Gain: <span id="alphaGainValue">1.0</span></label><br>
-                <input type="range" id="alphaGain" min="0.1" max="3" step="0.1" value="1.0">
-            </div>
-            <div class="control-group">
-                <label><input type="checkbox" id="adaptiveAlpha" checked> Adaptive Alpha</label>
-            </div>
-            <div class="control-group">
-                <label><input type="checkbox" id="highQualityCleanup" checked> High Quality Cleanup</label>
-            </div>
-            <div class="control-group">
-                <label><input type="checkbox" id="allowLowConfidence"> Allow Low Confidence</label>
-            </div>
-            <div class="control-group">
-                <label>Denoise Backend:</label>
-                <select id="denoiseBackend">
-                    <option value="allenk_fdncnn_browser_spike">allenk_fdncnn_browser_spike</option>
-                    <option value="none">none</option>
-                </select>
-            </div>
-            <div class="control-group">
-                <label>Edge Denoise: <span id="edgeDenoiseStrengthValue">0.5</span></label><br>
-                <input type="range" id="edgeDenoiseStrength" min="0" max="1" step="0.1" value="0.5">
-            </div>
-            <div class="control-group">
-                <label>Residual Cleanup: <span id="residualCleanupValue">0.5</span></label><br>
-                <input type="range" id="residualCleanup" min="0" max="1" step="0.1" value="0.5">
-            </div>
-            <div class="control-group">
-                <label>Video Bitrate (Mbps):</label>
-                <input type="number" id="videoBitrateMbps" value="5" step="1">
-            </div>
-            <div class="control-group">
-                <label>Sample Count:</label>
-                <input type="number" id="sampleCount" value="10" step="1">
-            </div>
-        </div>
-    </div>
-    
-    <div id="batchQueue" style="display: none;"></div>
 
-    <script type="module" src="video-app.js"></script>
-    <script>
-        document.getElementById('dropzone').addEventListener('click', () => {
-            document.getElementById('fileInput').click();
-        });
-        
-        // Setup basic bindings so range inputs update their labels
-        const binds = ['alphaGain', 'edgeDenoiseStrength', 'residualCleanup'];
-        binds.forEach(id => {
-            const el = document.getElementById(id);
-            const valEl = document.getElementById(id + 'Value');
-            if(el && valEl) {
-                el.addEventListener('input', () => { valEl.textContent = el.value; });
-            }
-        });
-    </script>
-</body>
-</html>
+  <!-- Icon library -->
+  <svg aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
+    <defs>
+      <linearGradient id="gSky" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#9db8ca"/><stop offset=".5" stop-color="#d5dfd9"/>
+        <stop offset=".78" stop-color="#f0dcb4"/><stop offset="1" stop-color="#f6e3bd"/>
+      </linearGradient>
+      <radialGradient id="gGlow">
+        <stop offset="0" stop-color="#ffedc4" stop-opacity=".9"/><stop offset="1" stop-color="#ffedc4" stop-opacity="0"/>
+      </radialGradient>
+      <linearGradient id="gSea" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#c9b491"/><stop offset=".4" stop-color="#7f98a0"/><stop offset="1" stop-color="#54707c"/>
+      </linearGradient>
+      <radialGradient id="gVig" cx=".5" cy=".45" r=".75">
+        <stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#1a120a" stop-opacity=".32"/>
+      </radialGradient>
+      <filter id="fGrain">
+        <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/>
+        <feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.6 0"/>
+      </filter>
+
+      <!-- Mock video frame (golden-hour coastline) -->
+      <symbol id="scene" viewBox="0 0 1280 720">
+        <rect width="1280" height="720" fill="url(#gSky)"/>
+        <circle cx="965" cy="285" r="190" fill="url(#gGlow)"/>
+        <circle cx="965" cy="285" r="58" fill="#fff4dc" opacity=".95"/>
+        <g fill="#ffffff" opacity=".5">
+          <ellipse cx="300" cy="150" rx="150" ry="26"/><ellipse cx="420" cy="182" rx="90" ry="18"/>
+          <ellipse cx="880" cy="110" rx="120" ry="20"/>
+        </g>
+        <path d="M0 400 170 320 330 402 470 340 640 405 820 355 985 408 1120 370 1280 415V470H0Z" fill="#8fa3ab"/>
+        <path d="M0 432 200 372 390 434 560 396 760 438 950 400 1130 440 1280 410V500H0Z" fill="#64808c"/>
+        <rect y="470" width="1280" height="250" fill="url(#gSea)"/>
+        <ellipse cx="965" cy="565" rx="150" ry="95" fill="#ffe9c0" opacity=".28"/>
+        <g stroke="#ffffff" opacity=".25" stroke-width="3" stroke-linecap="round" fill="none">
+          <path d="M140 520h130"/><path d="M330 556h90"/><path d="M620 540h150"/>
+          <path d="M1050 596h120"/><path d="M240 620h110"/><path d="M760 640h170"/><path d="M420 668h90"/>
+        </g>
+        <path d="M0 720V560q140-40 260 24 140 72 260 116l40 20Z" fill="#233230"/>
+        <rect width="1280" height="720" fill="url(#gVig)"/>
+        <rect width="1280" height="720" filter="url(#fGrain)" opacity=".05"/>
+      </symbol>
+
+      <!-- Watermark + detection box (drawn on top of the frame) -->
+      <symbol id="wm-bbox" viewBox="0 0 1280 720">
+        <g class="wm">
+          <path transform="translate(1140,626)" d="M0 -19C2.6 -5.8 5.8 -2.6 19 0 5.8 2.6 2.6 5.8 0 19-2.6 5.8-5.8 2.6-19 0-5.8-2.6-2.6-5.8 0-19Z"/>
+          <text x="1176" y="648">Veo</text>
+        </g>
+        <g>
+          <rect class="bb" x="1116" y="596" width="156" height="92" rx="12"/>
+          <rect class="bb-h" x="1111" y="591" width="10" height="10" rx="2"/>
+          <rect class="bb-h" x="1267" y="591" width="10" height="10" rx="2"/>
+          <rect class="bb-h" x="1111" y="683" width="10" height="10" rx="2"/>
+          <rect class="bb-h" x="1267" y="683" width="10" height="10" rx="2"/>
+          <g class="bb-chip">
+            <rect x="1116" y="556" width="146" height="28" rx="14"/>
+            <text x="1132" y="575">Watermark ?? 98%</text>
+          </g>
+        </g>
+      </symbol>
+
+      <!-- UI icons -->
+      <symbol id="i-spark" viewBox="0 0 24 24"><path fill="currentColor" stroke="none" d="M12 2.5c.9 4.6 2 5.7 6.6 6.6-4.6.9-5.7 2-6.6 6.6-.9-4.6-2-5.7-6.6-6.6 4.6-.9 5.7-2 6.6-6.6Zm5.5 12.2c.4 2.1 1 2.7 3 3.1-2 .4-2.6 1-3 3.1-.4-2.1-1-2.7-3-3.1 2-.4 2.6-1 3-3.1Z"/></symbol>
+      <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
+      <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2 4.8 13.4h5.7L10.6 22l8.6-11.4h-5.7z"/></symbol>
+      <symbol id="i-film" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="14" rx="2"/><path d="M7.5 5v14M16.5 5v14M3.5 9.5h4M3.5 14.5h4M16.5 9.5h4M16.5 14.5h4"/></symbol>
+      <symbol id="i-upload" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 9 5-5 5 5"/><path d="M12 4v11"/></symbol>
+      <symbol id="i-play" viewBox="0 0 24 24"><path fill="currentColor" stroke="none" d="M8 5.5v13l11-6.5z"/></symbol>
+      <symbol id="i-pause" viewBox="0 0 24 24"><rect fill="currentColor" stroke="none" x="7" y="5.5" width="3.4" height="13" rx="1"/><rect fill="currentColor" stroke="none" x="13.6" y="5.5" width="3.4" height="13" rx="1"/></symbol>
+      <symbol id="i-stop" viewBox="0 0 24 24"><rect fill="currentColor" stroke="none" x="7" y="7" width="10" height="10" rx="2"/></symbol>
+      <symbol id="i-expand" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></symbol>
+      <symbol id="i-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+      <symbol id="i-check" viewBox="0 0 24 24"><path d="M4.5 12.5 9.5 17.5 19.5 6.5"/></symbol>
+      <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 3v12"/></symbol>
+      <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20.49 15A9 9 0 1 1 18.4 5.6"/><path d="M21 3v6h-6"/></symbol>
+      <symbol id="i-shield" viewBox="0 0 24 24"><path d="m12 3 7 2.8v5.4c0 4.6-3 7.7-7 9.3-4-1.6-7-4.7-7-9.3V5.8z"/><path d="m9 12 2 2 4-4.5"/></symbol>
+      <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/><circle fill="currentColor" stroke="none" cx="9" cy="7" r="2.2"/><circle fill="currentColor" stroke="none" cx="15" cy="12" r="2.2"/><circle fill="currentColor" stroke="none" cx="7" cy="17" r="2.2"/></symbol>
+      <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+      <symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></symbol>
+    </defs>
+  </svg>
+
+  <!-- ============ Header ============ -->
+  <header class="topbar">
+    <div class="shell topbar-in">
+      <a class="brand" href="#">
+        <span class="brand-mark"><svg class="ic" aria-hidden="true"><use href="#i-spark"/></svg></span>
+        <span class="brand-name">Logo Remover</span>
+      </a>
+      <nav class="nav" aria-label="Main">
+        <a href="#">How it works</a>
+        <a href="#privacy">Privacy</a>
+        <a href="#">Help</a>
+      </nav>
+      <div class="top-actions">
+        <span class="live-badge"><i class="dot" aria-hidden="true"></i>Local Processing</span>
+        <button id="themeToggle" class="theme-toggle" type="button" aria-label="Toggle dark or light theme">
+          <svg class="ic icon-moon" aria-hidden="true"><use href="#i-moon"/></svg>
+          <svg class="ic icon-sun" aria-hidden="true"><use href="#i-sun"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="shell">
+    <!-- ============ Hero ============ -->
+    <section class="hero">
+      <h1>Remove Video Watermarks ??? <span class="accent-word">Privately</span></h1>
+      <p class="sub">Detect and remove unwanted logos or watermarks from your videos directly in your browser. Your files never leave your device.</p>
+      <ul class="trust">
+        <li><svg class="ic" aria-hidden="true"><use href="#i-lock"/></svg>No uploads</li>
+        <li><svg class="ic" aria-hidden="true"><use href="#i-bolt"/></svg>Browser processing</li>
+        <li><svg class="ic" aria-hidden="true"><use href="#i-film"/></svg>Frame-by-frame processing</li>
+      </ul>
+    </section>
+
+    <!-- ============ Workspace ============ -->
+    <section class="workspace">
+      <!-- LEFT: comparison -->
+      <div class="col-main">
+        <article class="card" id="compareCard">
+          <div class="card-head">
+            <h2 class="card-title"><svg class="ic" aria-hidden="true"><use href="#i-film"/></svg>Before / After</h2>
+            <span class="hint">Drag the handle to compare</span>
+          </div>
+          <div class="ba-stage" id="baStage">
+            <div class="ba-layer ba-after">
+              <video id="processedVideo" class="frame" style="object-fit: contain; width: 100%; height: 100%; background: #000" hidden></video><img id="processedImage" class="frame" style="object-fit: contain; width: 100%; height: 100%; background: #000" hidden>
+              <span class="ba-badge badge-after" id="afterBadge">After</span><div id="processedEmpty" style="position:absolute; inset:0; display:grid; place-items:center; color:#fff; font-family:var(--mono); font-size:14px; background:rgba(0,0,0,0.5); z-index:4">Processing will appear here</div>
+            </div>
+            <div class="ba-layer ba-before">
+              <video id="originalVideo" class="frame" style="object-fit: contain; width: 100%; height: 100%; background: #000" hidden></video><img id="originalImage" class="frame" style="object-fit: contain; width: 100%; height: 100%; background: #000" hidden>
+              <span class="ba-badge badge-before">Before</span><div id="originalEmpty" style="position:absolute; inset:0; display:grid; place-items:center; color:#fff; font-family:var(--mono); font-size:14px; background:rgba(0,0,0,0.5); z-index:4">No video selected</div>
+            </div>
+            <div class="ba-divider">
+              <div class="ba-handle" id="baHandle" role="slider" tabindex="0"
+                   aria-label="Comparison position" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" aria-orientation="horizontal">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="m9 7-4 5 4 5"/><path d="m15 7 4 5-4 5"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div class="player-bar">
+            <button id="playPauseBtn" class="icon-btn" type="button" data-playing="false" aria-label="Play">
+              <svg class="ic ic-play" aria-hidden="true"><use href="#i-play"/></svg>
+              <svg class="ic ic-pause" aria-hidden="true"><use href="#i-pause"/></svg>
+            </button>
+            <input id="scrubber" class="scrub" type="range" min="0" max="1000" value="400" aria-label="Timeline">
+            <span id="timeLabel" class="mono time">00:04 / 00:10</span>
+            <button id="fsBtn" class="icon-btn" type="button" aria-label="Fullscreen">
+              <svg class="ic" aria-hidden="true"><use href="#i-expand"/></svg>
+            </button>
+          </div>
+        </article>
+
+        <details class="card" open>
+          <summary>
+            <span class="card-title"><svg class="ic" aria-hidden="true"><use href="#i-film"/></svg>Video Information</span>
+            <svg class="ic chev" aria-hidden="true"><use href="#i-chev"/></svg>
+          </summary>
+          <div id="metadata" class="rows">Waiting for video</div>
+        </details>
+      </div>
+
+      <!-- RIGHT: workflow -->
+      <div class="col-side">
+        <article class="card">
+          <div class="drop" id="dropzone" role="button" tabindex="0" aria-label="Upload a video">
+            <div class="drop-icon"><svg class="ic" aria-hidden="true"><use href="#i-upload"/></svg></div>
+            <h3>Drop your video here</h3>
+            <p class="fmt">MP4, MOV, WebM ?? up to 2 GB</p>
+            <button class="btn btn-tonal" type="button">
+              <svg class="ic" aria-hidden="true"><use href="#i-upload"/></svg>Choose Video
+            </button>
+            <br>
+            <span class="privacy"><svg class="ic" aria-hidden="true"><use href="#i-lock"/></svg>Processed locally in your browser</span>
+            <input id="fileInput" type="file" accept="video/mp4,video/webm,video/quicktime,video/*" hidden>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-head">
+            <h2 class="card-title"><svg class="ic" aria-hidden="true"><use href="#i-spark"/></svg>Workflow</h2>
+            <span class="hint">3 steps ?? 100% local</span>
+          </div>
+          <ol class="steps">
+            <!-- Step 1 -->
+            <li class="step done">
+              <span class="step-dot"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg></span>
+              <div>
+                <p class="step-title">Upload</p>
+                <div class="step-body">
+                  <div class="file-chip">
+                    <svg class="ic" aria-hidden="true"><use href="#i-film"/></svg>
+                    <b id="fileName">my_video_1080p.mp4</b>
+                    <span id="fileMeta">1920 ?? 1080 ?? 00:10 ?? 24 MB</span>
+                  </div>
+                </div>
+              </div>
+            </li>
+            <!-- Step 2 -->
+            <li class="step done">
+              <span class="step-dot"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg></span>
+              <div>
+                <p class="step-title">Watermark detected</p>
+                <p class="step-sub">Found automatically ??? no manual selection needed.</p>
+                <div class="step-body">
+                  <div class="detect" id="detection">Waiting for detection</div>
+                <div id="autoPresetSummary" style="margin-top: 10px; font-size: 13px;"></div>
+                </div>
+              </div>
+            </li>
+            <!-- Step 3 -->
+            <li class="step current">
+              <span class="step-dot">3</span>
+              <div>
+                <p class="step-title">Remove &amp; Export</p>
+                <p class="step-sub">Every frame is cleaned and re-encoded on your device.</p>
+                <div class="step-body cta-row">
+                  <button id="processBtn" class="btn btn-primary btn-lg" type="button" disabled>
+                    <svg class="ic" aria-hidden="true"><use href="#i-spark"/></svg>Remove Watermark &amp; Export
+                  </button>
+                  <button id="resetBtn" class="btn btn-ghost" type="button" disabled>Reset</button>
+                </div>
+              </div>
+            </li>
+          </ol>
+        </article>
+
+        <p class="state-caption">Processing state</p>
+        <article class="card" id="procCard">
+          <div class="proc-top">
+            <div class="ring" role="img" aria-label="Processing 63 percent">
+              <svg viewBox="0 0 64 64" aria-hidden="true">
+                <circle class="ring-track" cx="32" cy="32" r="26"/>
+                <circle class="ring-fill" cx="32" cy="32" r="26"/>
+              </svg>
+              <b id="progressText">0%</b>
+            </div>
+            <div>
+              <h3 id="procTitle">Processing video???</h3>
+              <p id="procSub">Inpainting frames locally ??? nothing is uploaded.</p>
+            </div>
+          </div>
+          <div class="proc-bar"><div class="bar"><i id="progressBar"></i></div></div>
+          <div class="proc-meta">
+            <span>Frame 684 / 1080</span>
+            <span>??? 12 sec remaining</span>
+          </div>
+          <div class="proc-foot">
+            <span class="proc-note" id="procNote">
+              <svg class="ic" aria-hidden="true"><use href="#i-lock"/></svg>Video is being processed locally
+            </span>
+            <button id="cancelBtn" class="btn btn-danger btn-sm" type="button">
+              <svg class="ic" aria-hidden="true"><use href="#i-stop"/></svg>Stop Processing
+            </button>
+          </div>
+        </article>
+
+        <p class="state-caption">Result state</p>
+        <article class="card">
+          <div class="success">
+            <span class="success-icon"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg></span>
+            <h3>Your video is ready</h3>
+            <p>Watermark removed successfully.</p>
+            <div class="result-meta">
+              <div><span>File</span><b>my_video_1080p.mp4</b></div>
+              <div><span>Output</span><b>1920 ?? 1080 ?? H.264</b></div>
+              <div><span>Processing time</span><b>14.2 sec</b></div>
+            </div>
+            <a id="downloadBtn" class="btn btn-primary btn-lg" tabindex="-1" aria-disabled="true">
+              <svg class="ic" aria-hidden="true"><use href="#i-download"/></svg>Download Video
+            </a>
+            <button class="btn btn-lg" type="button" onclick="document.getElementById('resetBtn').click()">
+              <svg class="ic" aria-hidden="true"><use href="#i-refresh"/></svg>Process Another Video
+            </button>
+          </div>
+        </article>
+
+        <details class="card">
+          <summary>
+            <span class="card-title"><svg class="ic" aria-hidden="true"><use href="#i-sliders"/></svg>Advanced Settings</span>
+            <svg class="ic chev" aria-hidden="true"><use href="#i-chev"/></svg>
+          </summary>
+          <div class="adv-body">
+            <div class="field">
+              <label>Alpha Gain: <output id="alphaGainValue">1.00</output></label>
+              <input type="range" id="alphaGain" min="0.1" max="3" step="0.1" value="1.0">
+            </div>
+            <div class="field">
+              <label>Edge Denoise Strength: <output id="edgeDenoiseStrengthValue">0.50</output></label>
+              <input type="range" id="edgeDenoiseStrength" min="0" max="1" step="0.1" value="0.5">
+            </div>
+            <div class="field">
+              <label>Residual Cleanup: <output id="residualCleanupValue">0.50</output></label>
+              <input type="range" id="residualCleanup" min="0" max="1" step="0.1" value="0.5">
+            </div>
+            <div class="field">
+              <label for="denoiseBackend">Denoise Backend</label>
+              <select id="denoiseBackend">
+                  <option value="allenk_fdncnn_browser_spike">allenk_fdncnn_browser_spike</option>
+                  <option value="none">none</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="videoBitrateMbps">Video Bitrate (Mbps)</label>
+              <input type="number" id="videoBitrateMbps" value="5" step="1" class="btn-sm" style="width:100%; border:1px solid var(--border-2); background:var(--surface); border-radius:8px; padding:0 10px;">
+            </div>
+            <div class="field">
+              <label for="sampleCount">Sample Count</label>
+              <input type="number" id="sampleCount" value="10" step="1" class="btn-sm" style="width:100%; border:1px solid var(--border-2); background:var(--surface); border-radius:8px; padding:0 10px;">
+            </div>
+            <div class="checks">
+              <label class="check"><input type="checkbox" id="adaptiveAlpha" checked> Adaptive Alpha</label>
+              <label class="check"><input type="checkbox" id="highQualityCleanup" checked> High Quality Cleanup</label>
+              <label class="check"><input type="checkbox" id="allowLowConfidence"> Allow Low Confidence</label>
+            </div>
+</div>
+        </details>
+
+        <article class="card privacy-card" id="privacy">
+          <div class="privacy-in">
+            <span class="privacy-icon"><svg class="ic" aria-hidden="true"><use href="#i-shield"/></svg></span>
+            <div>
+              <h3>Your privacy matters</h3>
+              <p>Everything happens locally in your browser. Your original video is never uploaded to a server.</p>
+              <span class="tech-chip"><svg class="ic" aria-hidden="true"><use href="#i-bolt"/></svg>WebCodecs + Mediabunny</span>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ Footer ============ -->
+  <footer>
+    <div class="shell foot-in">
+      <span>Logo Remover ?? Local Video Processing</span>
+      <nav class="foot-links" aria-label="Footer">
+        <a href="#privacy">Privacy</a><i>??</i>
+        <a href="#">How it works</a><i>??</i>
+        <a href="#">GitHub</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      var doc = document, root = doc.documentElement;
+
+      /* ---- Theme toggle ---- */
+      var tBtn = doc.getElementById('themeToggle');
+      var meta = doc.querySelector('meta[name="theme-color"]');
+      function applyTheme(t) {
+        root.setAttribute('data-theme', t);
+        try { localStorage.setItem('lr-theme', t); } catch (e) {}
+        if (meta) meta.setAttribute('content', t === 'dark' ? '#16120d' : '#f6f2ea');
+      }
+      if (tBtn) tBtn.addEventListener('click', function () {
+        applyTheme(root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+      });
+      applyTheme(root.getAttribute('data-theme') || 'light');
+
+      })();
+  </script>
