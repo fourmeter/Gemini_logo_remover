@@ -403,6 +403,9 @@ if (isProd) {
   copyExtensionStaticAssets();
   try {
     cpSync('public', 'dist', { recursive: true });
+    // Remove unused JSEP wasm binary (25.02 MiB) to satisfy Cloudflare Pages 25 MiB file size limit
+    rmSync('dist/onnxruntime/ort-wasm-simd-threaded.jsep.wasm', { force: true });
+    rmSync('dist/onnxruntime/ort-wasm-simd-threaded.jsep.mjs', { force: true });
   } catch (e) {
     // ignore
   }
