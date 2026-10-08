@@ -415,6 +415,7 @@ function renderAutoPresetSummary(preset = null) {
 }
 
 function renderMetadata(metadata) {
+    if (!els.metadata) return;
     if (!metadata) {
         els.metadata.innerHTML = '<p class="muted">Waiting for video</p>';
         return;
@@ -1032,77 +1033,99 @@ function applyRelocatedReviewPreset() {
 }
 
 function setupEvents() {
-    els.dropzone.addEventListener('click', () => els.fileInput.click());
-    els.dropzone.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter' || event.key === ' ') {
-            event.preventDefault();
-            els.fileInput.click();
+    if (els.dropzone && els.fileInput) {
+        els.dropzone.addEventListener('click', () => els.fileInput.click());
+        els.dropzone.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                els.fileInput.click();
+            }
+        });
+
+        for (const eventName of ['dragenter', 'dragover']) {
+            els.dropzone.addEventListener(eventName, (event) => {
+                event.preventDefault();
+                els.dropzone.dataset.dragging = 'true';
+            });
         }
-    });
-    els.fileInput.addEventListener('change', (event) => {
-        handleIncomingFiles(event.target.files);
-    });
-
-    for (const eventName of ['dragenter', 'dragover']) {
-        els.dropzone.addEventListener(eventName, (event) => {
-            event.preventDefault();
-            els.dropzone.dataset.dragging = 'true';
+        for (const eventName of ['dragleave', 'drop']) {
+            els.dropzone.addEventListener(eventName, (event) => {
+                event.preventDefault();
+                els.dropzone.dataset.dragging = 'false';
+            });
+        }
+        els.dropzone.addEventListener('drop', (event) => {
+            handleIncomingFiles(event.dataTransfer?.files);
         });
     }
-    for (const eventName of ['dragleave', 'drop']) {
-        els.dropzone.addEventListener(eventName, (event) => {
-            event.preventDefault();
-            els.dropzone.dataset.dragging = 'false';
+
+    if (els.fileInput) {
+        els.fileInput.addEventListener('change', (event) => {
+            handleIncomingFiles(event.target.files);
         });
     }
-    els.dropzone.addEventListener('drop', (event) => {
-        handleIncomingFiles(event.dataTransfer?.files);
-    });
 
-    els.alphaGain.addEventListener('input', () => {
-        els.alphaGainValue.textContent = Number(els.alphaGain.value).toFixed(2);
-    });
-    els.residualCleanup.addEventListener('input', () => {
-        els.residualCleanupValue.textContent = Number(els.residualCleanup.value).toFixed(2);
-    });
-    els.edgeDenoiseStrength.addEventListener('input', () => {
-        els.edgeDenoiseStrengthValue.textContent = Number(els.edgeDenoiseStrength.value).toFixed(2);
-    });
-    els.denoiseBackend.addEventListener('change', () => {
-        if (els.denoiseBackend.value !== VIDEO_DENOISE_BACKENDS.ALLENK_FDNCNN_BROWSER_SPIKE) return;
-        setNumberControl(els.edgeDenoiseStrength, 1.8);
-    });
-    els.detectBtn.addEventListener('click', runDetection);
-    els.processBtn.addEventListener('click', () => runExport());
-    els.cancelBtn.addEventListener('click', cancelProcessing);
-    els.resetBtn.addEventListener('click', reset);
-    els.relocatedReviewPresetBtn.addEventListener('click', applyRelocatedReviewPreset);
-    els.downloadBtn.addEventListener('click', (event) => {
-        if (!state.processedUrl || state.running) event.preventDefault();
-    });
-    els.playPauseBtn.addEventListener('click', togglePlayback);
-    els.scrubber.addEventListener('input', (event) => {
-        seekComparison(event.target.value);
-    });
-    els.originalVideo.addEventListener('loadedmetadata', () => {
-        updatePlaybackControls();
-    });
-    els.originalVideo.addEventListener('timeupdate', () => {
-        if (!els.originalVideo.paused) syncProcessedToOriginal();
-        updatePlaybackControls();
-    });
-    els.originalVideo.addEventListener('pause', () => {
-        if (!els.processedVideo.paused) els.processedVideo.pause();
-        updatePlaybackControls();
-    });
-    els.originalVideo.addEventListener('ended', () => {
-        pauseComparison();
-    });
-    els.processedVideo.addEventListener('loadedmetadata', () => {
-        syncProcessedToOriginal({ force: true });
-        updateCompareMode();
-    });
+    if (els.alphaGain) {
+        els.alphaGain.addEventListener('input', () => {
+            if (els.alphaGainValue) els.alphaGainValue.textContent = Number(els.alphaGain.value).toFixed(2);
+        });
+    }
+    if (els.residualCleanup) {
+        els.residualCleanup.addEventListener('input', () => {
+            if (els.residualCleanupValue) els.residualCleanupValue.textContent = Number(els.residualCleanup.value).toFixed(2);
+        });
+    }
+    if (els.edgeDenoiseStrength) {
+        els.edgeDenoiseStrength.addEventListener('input', () => {
+            if (els.edgeDenoiseStrengthValue) els.edgeDenoiseStrengthValue.textContent = Number(els.edgeDenoiseStrength.value).toFixed(2);
+        });
+    }
+    if (els.denoiseBackend) {
+        els.denoiseBackend.addEventListener('change', () => {
+            if (els.denoiseBackend.value !== VIDEO_DENOISE_BACKENDS.ALLENK_FDNCNN_BROWSER_SPIKE) return;
+            setNumberControl(els.edgeDenoiseStrength, 1.8);
+        });
+    }
+    if (els.detectBtn) els.detectBtn.addEventListener('click', runDetection);
+    if (els.processBtn) els.processBtn.addEventListener('click', () => runExport());
+    if (els.cancelBtn) els.cancelBtn.addEventListener('click', cancelProcessing);
+    if (els.resetBtn) els.resetBtn.addEventListener('click', reset);
+    if (els.relocatedReviewPresetBtn) els.relocatedReviewPresetBtn.addEventListener('click', applyRelocatedReviewPreset);
+    if (els.downloadBtn) {
+        els.downloadBtn.addEventListener('click', (event) => {
+            if (!state.processedUrl || state.running) event.preventDefault();
+        });
+    }
+    if (els.playPauseBtn) els.playPauseBtn.addEventListener('click', togglePlayback);
+    if (els.scrubber) {
+        els.scrubber.addEventListener('input', (event) => {
+            seekComparison(event.target.value);
+        });
+    }
+    if (els.originalVideo) {
+        els.originalVideo.addEventListener('loadedmetadata', () => {
+            updatePlaybackControls();
+        });
+        els.originalVideo.addEventListener('timeupdate', () => {
+            if (!els.originalVideo.paused) syncProcessedToOriginal();
+            updatePlaybackControls();
+        });
+        els.originalVideo.addEventListener('pause', () => {
+            if (els.processedVideo && !els.processedVideo.paused) els.processedVideo.pause();
+            updatePlaybackControls();
+        });
+        els.originalVideo.addEventListener('ended', () => {
+            pauseComparison();
+        });
+    }
+    if (els.processedVideo) {
+        els.processedVideo.addEventListener('loadedmetadata', () => {
+            syncProcessedToOriginal({ force: true });
+            updateCompareMode();
+        });
+    }
     window.addEventListener('beforeunload', cleanupUrls);
+    window.__gwrHandleFiles = handleIncomingFiles;
 }
 
 async function consumePendingVideoHandoff() {

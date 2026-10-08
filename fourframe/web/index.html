@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gemini Watermark Remover — FourFrame Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #F8FAFC;
+      --surface: #FFFFFF;
+      --card-bg: #FFFFFF;
+      --border: #E2E8F0;
+      --border-subtle: #EDF2F7;
+      --text-main: #0B0F19;
+      --text-sub: #475569;
+      --text-muted: #64748B;
+      --primary: #1A68FF;
+      --primary-hover: #0F57E8;
+      --primary-glow: rgba(26, 104, 255, 0.35);
+      --mint: #10B981;
+      --mint-glow: rgba(16, 185, 129, 0.25);
+      --cyan: #0284C7;
+      --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.05);
+      --shadow-md: 0 12px 32px -8px rgba(15, 23, 42, 0.08);
+      --shadow-lg: 0 24px 64px -12px rgba(15, 23, 42, 0.12), 0 8px 24px -4px rgba(15, 23, 42, 0.04);
+      --shadow-tilted: 0 24px 48px -12px rgba(15, 23, 42, 0.16), 0 8px 16px -4px rgba(0,0,0,0.06);
+      --radius-pill: 999px;
+      --radius-card: 28px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* Top Navigation Bar */
+    header {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-subtle);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text-main);
+    }
+
+    .brand-mark {
+      background: linear-gradient(135deg, var(--primary), #3B82F6);
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 14px;
+      color: #fff;
+      box-shadow: 0 4px 12px var(--primary-glow);
+    }
+
+    .brand-name {
+      font-size: 17px;
+      font-weight: 750;
+      letter-spacing: -0.02em;
+    }
+
+    .nav-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      padding: 6px 14px;
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.22);
+      color: #059669;
+      border-radius: var(--radius-pill);
+      font-weight: 600;
+    }
+
+    .pulse-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--mint);
+      box-shadow: 0 0 8px var(--mint);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+
+    /* =========================================================
+       HERO BLUEPRINT SECTION
+       ========================================================= */
+    .hero-section {
+      text-align: center;
+      padding: 72px 20px 48px;
+      max-width: 1280px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .hero-title {
+      font-size: clamp(2.4rem, 5.2vw, 3.8rem);
+      font-weight: 800;
+      letter-spacing: -0.035em;
+      line-height: 1.12;
+      color: var(--text-main);
+      margin-bottom: 16px;
+    }
+
+    .hero-subtitle {
+      font-size: 17.5px;
+      color: var(--text-sub);
+      line-height: 1.6;
+      max-width: 620px;
+      margin: 0 auto 32px;
+    }
+
+    /* Pill Mode Switcher */
+    .mode-switcher {
+      display: inline-flex;
+      background: #EDF1F7;
+      border-radius: var(--radius-pill);
+      padding: 4px;
+      gap: 4px;
+      margin-bottom: 40px;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.04);
+    }
+
+    .mode-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 22px;
+      border-radius: var(--radius-pill);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-muted);
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .mode-btn.active {
+      background: #FFFFFF;
+      color: var(--text-main);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    .beta-badge {
+      font-size: 10px;
+      font-weight: 750;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      background: #DBEAFE;
+      color: var(--primary);
+      padding: 2px 6px;
+      border-radius: 4px;
+      line-height: 1.2;
+    }
+
+    /* Visual Floating Stage */
+    .hero-stage {
+      position: relative;
+      max-width: 960px;
+      margin: 0 auto;
+      min-height: 400px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Tilted Backdrop Cards */
+    .tilted-card {
+      position: absolute;
+      width: 260px;
+      height: 260px;
+      border-radius: 24px;
+      border: 8px solid #FFFFFF;
+      box-shadow: var(--shadow-tilted);
+      overflow: hidden;
+      z-index: 1;
+      pointer-events: none;
+      transition: transform 0.4s ease;
+    }
+
+    .tilted-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .tilted-left {
+      left: 12px;
+      transform: rotate(-9deg) translateY(-24px);
+    }
+
+    .tilted-right {
+      right: 12px;
+      transform: rotate(9deg) translateY(-24px);
+    }
+
+    @media (max-width: 860px) {
+      .tilted-card { display: none; }
+    }
+
+    /* Front Floating Hero Card */
+    .upload-card {
+      position: relative;
+      z-index: 2;
+      width: min(640px, 94vw);
+      min-height: 320px;
+      background: #FFFFFF;
+      border-radius: var(--radius-card);
+      border: 1.5px solid rgba(226, 232, 240, 0.9);
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 44px 32px;
+      cursor: pointer;
+      overflow: hidden;
+      transition: all 0.25s ease;
+      
+      /* Subtle transparency checkerboard */
+      background-image: 
+        linear-gradient(45deg, #F5F7FA 25%, transparent 25%), 
+        linear-gradient(-45deg, #F5F7FA 25%, transparent 25%), 
+        linear-gradient(45deg, transparent 75%, #F5F7FA 75%), 
+        linear-gradient(-45deg, transparent 75%, #F5F7FA 75%);
+      background-size: 24px 24px;
+      background-position: 0 0, 0 12px, 12px -12px, -12px 0px;
+    }
+
+    .upload-card:hover, .upload-card.dragover {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+      box-shadow: 0 32px 72px -12px rgba(26, 104, 255, 0.18), 0 12px 28px -4px rgba(15, 23, 42, 0.06);
+    }
+
+    .btn-hero-action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      height: 54px;
+      padding: 0 36px;
+      background: var(--primary);
+      color: #FFFFFF;
+      font-size: 16px;
+      font-weight: 700;
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px -4px var(--primary-glow);
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .btn-hero-action:hover {
+      background: var(--primary-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 12px 28px -4px rgba(26, 104, 255, 0.45);
+    }
+
+    .upload-sublabel {
+      margin-top: 18px;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .upload-privacy-note {
+      margin-top: 12px;
+      font-size: 12px;
+      color: var(--text-muted);
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    /* Quick Sample Button */
+    .quick-sample-wrap {
+      margin-top: 24px;
+    }
+
+    .btn-text-link {
+      background: transparent;
+      border: none;
+      color: var(--primary);
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      transition: background 0.15s;
+    }
+
+    .btn-text-link:hover {
+      background: rgba(26, 104, 255, 0.08);
+    }
+
+    /* =========================================================
+       ACTIVE WORKSPACE STUDIO (Appears after file load)
+       ========================================================= */
+    .workspace-section {
+      display: none;
+      max-width: 1360px;
+      margin: 0 auto 60px;
+      padding: 0 24px;
+      width: 100%;
+    }
+
+    .workspace-section.active {
+      display: block;
+      animation: fadeIn 0.35s ease;
+    }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+    .workspace-grid {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 24px;
+      align-items: start;
+    }
+
+    @media (max-width: 1024px) {
+      .workspace-grid { grid-template-columns: 1fr; }
+    }
+
+    .studio-card {
+      background: #FFFFFF;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+    }
+
+    .studio-head {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .studio-title {
+      font-size: 16px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .viewport-box {
+      position: relative;
+      background: #0B0F19;
+      min-height: 480px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    #roiCanvas {
+      max-width: 100%;
+      max-height: 620px;
+      display: block;
+      cursor: crosshair;
+    }
+
+    .canvas-hud {
+      padding: 12px 20px;
+      background: #F8FAFC;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12.5px;
+    }
+
+    .coord-pills {
+      display: flex;
+      gap: 10px;
+    }
+
+    .coord-item {
+      color: var(--text-muted);
+    }
+
+    .coord-item b {
+      color: var(--primary);
+    }
+
+    /* Comparison Split Stage */
+    .cmp-stage {
+      position: relative;
+      margin-top: 20px;
+      background: #000;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      display: none;
+    }
+
+    .cmp-stage.active { display: block; }
+
+    .cmp-wrap {
+      position: relative;
+      width: 100%;
+      height: 440px;
+      overflow: hidden;
+    }
+
+    .cmp-layer {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .cmp-layer img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: #000;
+    }
+
+    .cmp-before {
+      clip-path: polygon(0 0, var(--pos, 50%) 0, var(--pos, 50%) 100%, 0 100%);
+    }
+
+    .cmp-divider {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: var(--pos, 50%);
+      width: 2px;
+      background: #FFFFFF;
+      box-shadow: 0 0 12px rgba(26, 104, 255, 0.8);
+      cursor: ew-resize;
+      z-index: 10;
+    }
+
+    .cmp-handle {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #FFFFFF;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary);
+      font-weight: 800;
+      font-size: 14px;
+      border: 2px solid var(--primary);
+    }
+
+    /* Controls Panel */
+    .panel-body {
+      padding: 24px;
+    }
+
+    .field-group {
+      margin-bottom: 20px;
+    }
+
+    .field-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 8px;
+    }
+
+    .field-label output {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12.5px;
+      color: var(--primary);
+    }
+
+    select, input[type="range"] {
+      width: 100%;
+    }
+
+    select {
+      height: 42px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #F8FAFC;
+      padding: 0 12px;
+      font-size: 14px;
+      color: var(--text-main);
+      font-family: inherit;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      height: 6px;
+      border-radius: 999px;
+      background: #E2E8F0;
+      outline: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--primary);
+      border: 2px solid #FFFFFF;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    }
+
+    .btn-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .btn-action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      height: 46px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+
+    .btn-preview {
+      background: #EFF6FF;
+      color: var(--primary);
+      border: 1px solid #BFDBFE;
+    }
+
+    .btn-preview:hover {
+      background: #DBEAFE;
+    }
+
+    .btn-process {
+      background: var(--primary);
+      color: #FFFFFF;
+      box-shadow: 0 4px 14px var(--primary-glow);
+    }
+
+    .btn-process:hover {
+      background: var(--primary-hover);
+    }
+
+    /* Progress Box */
+    .progress-wrap {
+      margin-top: 18px;
+      display: none;
+    }
+
+    .progress-wrap.active { display: block; }
+
+    .progress-bar-bg {
+      height: 8px;
+      background: #E2E8F0;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--primary), var(--mint));
+      border-radius: 999px;
+      transition: width 0.25s ease;
+    }
+
+    .progress-info {
+      display: flex;
+      justify-content: space-between;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* Results */
+    .result-box {
+      margin-top: 22px;
+      padding: 20px;
+      background: #F0FDF4;
+      border: 1px solid #BBF7D0;
+      border-radius: 14px;
+      display: none;
+    }
+
+    .result-box.active { display: block; }
+
+    .result-table {
+      width: 100%;
+      font-size: 13px;
+      border-collapse: collapse;
+      margin-bottom: 16px;
+    }
+
+    .result-table td {
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .result-table td:last-child {
+      text-align: right;
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 600;
+    }
+
+    .btn-download {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      height: 48px;
+      background: var(--mint);
+      color: #FFFFFF;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 15px;
+      text-decoration: none;
+      box-shadow: 0 4px 14px var(--mint-glow);
+      transition: opacity 0.2s;
+    }
+
+    .btn-download:hover { opacity: 0.95; }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <header>
+    <div class="nav-inner">
+      <a href="#" class="brand">
+        <div class="brand-mark">4F</div>
+        <div class="brand-name">FourFrame</div>
+      </a>
+      <div class="nav-tag">
+        <span class="pulse-dot"></span>
+        100% Local &middot; Private Processing
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section Matching Blueprint -->
+  <section class="hero-section">
+    <h1 class="hero-title">Gemini Watermark Remover</h1>
+    <p class="hero-subtitle">
+      Free online Gemini watermark cleaner for images, logos, and star overlays.<br>
+      No upload, no sign-up &mdash; 100% local, private processing.
+    </p>
+
+    <!-- Images / Videos BETA Segmented Switcher -->
+    <div class="mode-switcher" role="tablist">
+      <button type="button" class="mode-btn active" id="tabImages" role="tab" aria-selected="true">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+        Images
+      </button>
+      <button type="button" class="mode-btn" id="tabVideos" role="tab" aria-selected="false">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+        Videos
+        <span class="beta-badge">BETA</span>
+      </button>
+    </div>
+
+    <!-- Floating Blueprint Stage -->
+    <div class="hero-stage">
+      
+      <!-- Tilted Left Card -->
+      <div class="tilted-card tilted-left" aria-hidden="true">
+        <img src="assets/sample-card-left.jpg" alt="Sample artwork pastel liquid marble">
+      </div>
+
+      <!-- Tilted Right Card -->
+      <div class="tilted-card tilted-right" aria-hidden="true">
+        <img src="assets/sample-card-right.jpg" alt="Sample artwork deep crimson teal texture">
+      </div>
+
+      <!-- Front Center Floating Upload Card -->
+      <div class="upload-card" id="heroDropzone" role="button" tabindex="0">
+        <button type="button" class="btn-hero-action" id="btnHeroAction">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span id="heroActionText">Start with photos</span>
+        </button>
+        <p class="upload-sublabel" id="heroDragText">or drag images here</p>
+        <span class="upload-privacy-note">100% Client-Side &middot; Never Leaves Your Computer</span>
+        <input type="file" id="mediaInput" accept="image/png,image/jpeg,image/webp" style="display:none;">
+      </div>
+
+    </div>
+
+    <div class="quick-sample-wrap">
+      <button type="button" class="btn-text-link" id="btnLoadSample">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Or test with built-in sample video
+      </button>
+    </div>
+  </section>
+
+  <!-- Interactive Studio Section (Appears after file load) -->
+  <section class="workspace-section" id="workspaceSection">
+    <div class="workspace-grid">
+      
+      <!-- Left: Interactive Canvas Studio -->
+      <div class="studio-card">
+        <div class="studio-head">
+          <div class="studio-title">
+            <svg width="18" height="18" fill="none" stroke="var(--primary)" stroke-width="2.2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+            Interactive Watermark Selector
+          </div>
+          <button type="button" class="btn-text-link" id="btnResetRoi">Reset Bounding Box</button>
+        </div>
+        
+        <div class="viewport-box">
+          <canvas id="roiCanvas"></canvas>
+        </div>
+
+        <div class="canvas-hud">
+          <div class="coord-pills">
+            <span class="coord-item">X: <b id="valX">0</b></span>
+            <span class="coord-item">Y: <b id="valY">0</b></span>
+            <span class="coord-item">W: <b id="valW">0</b></span>
+            <span class="coord-item">H: <b id="valH">0</b></span>
+          </div>
+          <span id="mediaMetaBadge" style="color:var(--text-muted)">Ready</span>
+        </div>
+
+        <!-- 3-Second Split Preview Stage -->
+        <div class="cmp-stage" id="cmpStage">
+          <div class="cmp-wrap" id="cmpWrap">
+            <div class="cmp-layer cmp-after">
+              <img id="cmpImgAfter" alt="Cleaned reconstruction">
+            </div>
+            <div class="cmp-layer cmp-before" id="cmpBeforeLayer">
+              <img id="cmpImgBefore" alt="Original watermark frame">
+            </div>
+            <div class="cmp-divider" id="cmpDivider">
+              <div class="cmp-handle">&harr;</div>
+            </div>
+          </div>
+          <div style="padding:10px 18px; background:#0F172A; display:flex; justify-content:space-between; font-size:12px; font-family:'IBM Plex Mono'; color:#94A3B8;">
+            <span>&larr; Original (Before)</span>
+            <span>Reconstructed (After) &rarr;</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Reconstruction Controls -->
+      <div class="studio-card">
+        <div class="studio-head">
+          <div class="studio-title">Reconstruction Parameters</div>
+        </div>
+        <div class="panel-body">
+          
+          <div class="field-group">
+            <div class="field-label">
+              <span>Inpainting Algorithm</span>
+            </div>
+            <select id="selMethod">
+              <option value="telea" selected>Telea (Fast Marching Method)</option>
+              <option value="ns">Navier-Stokes (Fluid Dynamics PDE)</option>
+            </select>
+          </div>
+
+          <div class="field-group">
+            <div class="field-label">
+              <span>Mask Margin Padding</span>
+              <output id="outPadding">5 px</output>
+            </div>
+            <input type="range" id="rngPadding" min="0" max="30" value="5">
+          </div>
+
+          <div class="field-group">
+            <div class="field-label">
+              <span>Inpainting Radius</span>
+              <output id="outRadius">3 px</output>
+            </div>
+            <input type="range" id="rngRadius" min="1" max="20" value="3">
+          </div>
+
+          <div class="field-group" id="groupCrf">
+            <div class="field-label">
+              <span>Video CRF Quality</span>
+              <output id="outCrf">18 (High)</output>
+            </div>
+            <input type="range" id="rngCrf" min="16" max="28" value="18">
+          </div>
+
+          <div class="btn-row">
+            <button type="button" class="btn-action btn-preview" id="btnPreview">
+              3s Preview
+            </button>
+            <button type="button" class="btn-action btn-process" id="btnProcess">
+              Process Entire Media
+            </button>
+          </div>
+
+          <!-- Live Progress -->
+          <div class="progress-wrap" id="progressWrap">
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-info">
+              <span id="txtProgressPct">0%</span>
+              <span id="txtProgressFrames">0 / 0</span>
+              <span id="txtProgressFps">-- FPS</span>
+              <span id="txtProgressEta">ETA: --</span>
+            </div>
+          </div>
+
+          <!-- Results Summary -->
+          <div class="result-box" id="resultBox">
+            <h4 style="color:#059669; margin-bottom:12px; font-weight:700;">Reconstruction Complete</h4>
+            <table class="result-table">
+              <tr><td>Resolution</td><td id="statRes">--</td></tr>
+              <tr><td>Frame Rate</td><td id="statFps">--</td></tr>
+              <tr><td>Duration</td><td id="statDur">--</td></tr>
+              <tr><td>Speed</td><td id="statSpeed">--</td></tr>
+              <tr><td>Diagnostic MAE</td><td id="statMae">--</td></tr>
+              <tr><td>Diagnostic PSNR</td><td id="statPsnr">--</td></tr>
+            </table>
+
+            <a href="#" class="btn-download" id="btnDownload" download>
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Download Clean File
+            </a>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <script>
+    // State management
+    const state = {
+      mode: 'images', // 'images' or 'videos'
+      filename: null,
+      metadata: null,
+      repImg: new Image(),
+      roi: { x: 0, y: 0, width: 0, height: 0 },
+      isDrawing: false,
+      startX: 0,
+      startY: 0,
+      jobId: null,
+    };
+
+    const tabImages = document.getElementById('tabImages');
+    const tabVideos = document.getElementById('tabVideos');
+    const heroDropzone = document.getElementById('heroDropzone');
+    const btnHeroAction = document.getElementById('btnHeroAction');
+    const heroActionText = document.getElementById('heroActionText');
+    const heroDragText = document.getElementById('heroDragText');
+    const mediaInput = document.getElementById('mediaInput');
+    const btnLoadSample = document.getElementById('btnLoadSample');
+
+    const workspaceSection = document.getElementById('workspaceSection');
+    const canvas = document.getElementById('roiCanvas');
+    const ctx = canvas.getContext('2d');
+    const valX = document.getElementById('valX');
+    const valY = document.getElementById('valY');
+    const valW = document.getElementById('valW');
+    const valH = document.getElementById('valH');
+    const mediaMetaBadge = document.getElementById('mediaMetaBadge');
+    const btnResetRoi = document.getElementById('btnResetRoi');
+
+    const rngPadding = document.getElementById('rngPadding');
+    const outPadding = document.getElementById('outPadding');
+    const rngRadius = document.getElementById('rngRadius');
+    const outRadius = document.getElementById('outRadius');
+    const rngCrf = document.getElementById('rngCrf');
+    const outCrf = document.getElementById('outCrf');
+    const selMethod = document.getElementById('selMethod');
+    const groupCrf = document.getElementById('groupCrf');
+
+    const btnPreview = document.getElementById('btnPreview');
+    const btnProcess = document.getElementById('btnProcess');
+    const cmpStage = document.getElementById('cmpStage');
+    const cmpWrap = document.getElementById('cmpWrap');
+    const cmpImgBefore = document.getElementById('cmpImgBefore');
+    const cmpImgAfter = document.getElementById('cmpImgAfter');
+
+    const progressWrap = document.getElementById('progressWrap');
+    const progressFill = document.getElementById('progressFill');
+    const txtProgressPct = document.getElementById('txtProgressPct');
+    const txtProgressFrames = document.getElementById('txtProgressFrames');
+    const txtProgressFps = document.getElementById('txtProgressFps');
+    const txtProgressEta = document.getElementById('txtProgressEta');
+
+    const resultBox = document.getElementById('resultBox');
+    const btnDownload = document.getElementById('btnDownload');
+    const statRes = document.getElementById('statRes');
+    const statFps = document.getElementById('statFps');
+    const statDur = document.getElementById('statDur');
+    const statSpeed = document.getElementById('statSpeed');
+    const statMae = document.getElementById('statMae');
+    const statPsnr = document.getElementById('statPsnr');
+
+    // Switch between Images and Videos
+    tabImages.onclick = () => setMode('images');
+    tabVideos.onclick = () => setMode('videos');
+
+    function setMode(newMode) {
+      state.mode = newMode;
+      if (newMode === 'images') {
+        tabImages.classList.add('active');
+        tabImages.setAttribute('aria-selected', 'true');
+        tabVideos.classList.remove('active');
+        tabVideos.setAttribute('aria-selected', 'false');
+        heroActionText.textContent = 'Start with photos';
+        heroDragText.textContent = 'or drag images here';
+        mediaInput.accept = 'image/png,image/jpeg,image/webp';
+        groupCrf.style.display = 'none';
+        btnPreview.textContent = 'Quick Inpaint Preview';
+      } else {
+        tabVideos.classList.add('active');
+        tabVideos.setAttribute('aria-selected', 'true');
+        tabImages.classList.remove('active');
+        tabImages.setAttribute('aria-selected', 'false');
+        heroActionText.textContent = 'Start with video';
+        heroDragText.textContent = 'or drag video here';
+        mediaInput.accept = 'video/mp4,video/quicktime,video/webm';
+        groupCrf.style.display = 'block';
+        btnPreview.textContent = '3s Preview';
+      }
+    }
+
+    // Default to photos
+    setMode('images');
+
+    // Sliders
+    rngPadding.oninput = () => outPadding.textContent = `${rngPadding.value} px`;
+    rngRadius.oninput = () => outRadius.textContent = `${rngRadius.value} px`;
+    rngCrf.oninput = () => outCrf.textContent = `${rngCrf.value} (${rngCrf.value <= 18 ? 'High' : rngCrf.value <= 23 ? 'Medium' : 'Smaller'})`;
+
+    // Dropzone
+    heroDropzone.onclick = () => mediaInput.click();
+    heroDropzone.ondragover = (e) => { e.preventDefault(); heroDropzone.classList.add('dragover'); };
+    heroDropzone.ondragleave = () => heroDropzone.classList.remove('dragover');
+    heroDropzone.ondrop = (e) => {
+      e.preventDefault();
+      heroDropzone.classList.remove('dragover');
+      if (e.dataTransfer.files.length) handleFileSelect(e.dataTransfer.files[0]);
+    };
+    mediaInput.onchange = () => {
+      if (mediaInput.files.length) handleFileSelect(mediaInput.files[0]);
+    };
+
+    btnLoadSample.onclick = async () => {
+      setMode('videos');
+      try {
+        btnLoadSample.textContent = "Loading sample video...";
+        const res = await fetch('/api/sample');
+        const data = await res.json();
+        if (data.error) throw new Error(data.error);
+        loadMediaData(data);
+      } catch (err) {
+        alert("Error loading sample: " + err.message);
+      } finally {
+        btnLoadSample.textContent = "Or test with built-in sample video";
+      }
+    };
+
+    async function handleFileSelect(file) {
+      if (file.type.startsWith('video/')) {
+        setMode('videos');
+      } else {
+        setMode('images');
+      }
+
+      heroActionText.textContent = "Loading media...";
+      try {
+        const res = await fetch('/api/upload', {
+          method: 'POST',
+          headers: { 'X-Filename': file.name },
+          body: file
+        });
+        const data = await res.json();
+        if (data.error) throw new Error(data.error);
+        loadMediaData(data);
+      } catch (err) {
+        alert("Upload error: " + err.message);
+        setMode(state.mode);
+      }
+    }
+
+    function loadMediaData(data) {
+      state.filename = data.filename;
+      state.metadata = data.metadata;
+
+      mediaMetaBadge.textContent = `${data.metadata.width}x${data.metadata.height} · ${data.metadata.fps} FPS · ${data.metadata.duration}s`;
+
+      state.repImg.onload = () => {
+        canvas.width = state.repImg.naturalWidth;
+        canvas.height = state.repImg.naturalHeight;
+
+        if (data.default_roi) {
+          state.roi = data.default_roi;
+        } else {
+          state.roi = {
+            x: Math.round(canvas.width * 0.8),
+            y: Math.round(canvas.height * 0.85),
+            width: Math.round(canvas.width * 0.15),
+            height: Math.round(canvas.height * 0.08)
+          };
+        }
+
+        updateRoiHud();
+        renderCanvas();
+        workspaceSection.classList.add('active');
+        workspaceSection.scrollIntoView({ behavior: 'smooth' });
+        btnHeroAction.textContent = "Change Selected Media";
+      };
+
+      state.repImg.src = data.frame_url + '?t=' + Date.now();
+    }
+
+    // Canvas drawing
+    function renderCanvas() {
+      if (!state.repImg.src) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(state.repImg, 0, 0);
+
+      const { x, y, width: w, height: h } = state.roi;
+      if (w > 0 && h > 0) {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
+        ctx.fillRect(0, 0, canvas.width, y);
+        ctx.fillRect(0, y, x, h);
+        ctx.fillRect(x + w, y, canvas.width - (x + w), h);
+        ctx.fillRect(0, y + h, canvas.width, canvas.height - (y + h));
+
+        // Border box
+        ctx.strokeStyle = '#1A68FF';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(x, y, w, h);
+
+        ctx.fillStyle = 'rgba(26, 104, 255, 0.2)';
+        ctx.fillRect(x, y, w, h);
+
+        // Corner handles
+        const s = 10;
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(x - s/2, y - s/2, s, s);
+        ctx.fillRect(x + w - s/2, y - s/2, s, s);
+        ctx.fillRect(x - s/2, y + h - s/2, s, s);
+        ctx.fillRect(x + w - s/2, y + h - s/2, s, s);
+
+        // Badge
+        ctx.fillStyle = '#1A68FF';
+        ctx.fillRect(x, Math.max(0, y - 24), 110, 24);
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = '700 11px IBM Plex Mono, monospace';
+        ctx.fillText('ROI WATERMARK', x + 8, Math.max(16, y - 7));
+      }
+    }
+
+    function getCanvasCoords(e) {
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      return {
+        x: Math.round((e.clientX - rect.left) * scaleX),
+        y: Math.round((e.clientY - rect.top) * scaleY)
+      };
+    }
+
+    canvas.onmousedown = (e) => {
+      const pt = getCanvasCoords(e);
+      state.isDrawing = true;
+      state.startX = pt.x;
+      state.startY = pt.y;
+      state.roi = { x: pt.x, y: pt.y, width: 1, height: 1 };
+    };
+
+    window.onmousemove = (e) => {
+      if (!state.isDrawing) return;
+      const pt = getCanvasCoords(e);
+      const x = Math.min(state.startX, pt.x);
+      const y = Math.min(state.startY, pt.y);
+      const w = Math.abs(pt.x - state.startX);
+      const h = Math.abs(pt.y - state.startY);
+
+      state.roi = {
+        x: Math.max(0, x),
+        y: Math.max(0, y),
+        width: Math.min(canvas.width - x, w),
+        height: Math.min(canvas.height - y, h)
+      };
+      updateRoiHud();
+      renderCanvas();
+    };
+
+    window.onmouseup = () => {
+      if (state.isDrawing) {
+        state.isDrawing = false;
+        if (state.roi.width < 5 || state.roi.height < 5) {
+          state.roi = { x: 0, y: 0, width: 0, height: 0 };
+        }
+        updateRoiHud();
+        renderCanvas();
+      }
+    };
+
+    function updateRoiHud() {
+      valX.textContent = state.roi.x;
+      valY.textContent = state.roi.y;
+      valW.textContent = state.roi.width;
+      valH.textContent = state.roi.height;
+    }
+
+    btnResetRoi.onclick = () => {
+      if (!canvas.width) return;
+      state.roi = {
+        x: Math.round(canvas.width * 0.8),
+        y: Math.round(canvas.height * 0.85),
+        width: Math.round(canvas.width * 0.15),
+        height: Math.round(canvas.height * 0.08)
+      };
+      updateRoiHud();
+      renderCanvas();
+    };
+
+    // 3s Preview
+    btnPreview.onclick = async () => {
+      try {
+        btnPreview.disabled = true;
+        btnPreview.textContent = "Rendering...";
+
+        const payload = {
+          filename: state.filename,
+          roi: state.roi,
+          padding: parseInt(rngPadding.value),
+          radius: parseInt(rngRadius.value),
+          method: selMethod.value,
+          preview_seconds: 3.0
+        };
+
+        const res = await fetch('/api/preview', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.error) throw new Error(data.error);
+
+        cmpImgBefore.src = state.repImg.src;
+        cmpImgAfter.src = data.preview_image_url;
+        cmpStage.classList.add('active');
+        cmpStage.scrollIntoView({ behavior: 'smooth' });
+
+      } catch (err) {
+        alert("Preview error: " + err.message);
+      } finally {
+        btnPreview.disabled = false;
+        btnPreview.textContent = "3s Preview";
+      }
+    };
+
+    // Split slider
+    let cmpDragging = false;
+    function setCmpPos(pct) {
+      const p = Math.max(0, Math.min(100, pct));
+      cmpStage.style.setProperty('--pos', p + '%');
+    }
+
+    cmpWrap.onpointerdown = (e) => {
+      cmpDragging = true;
+      cmpWrap.setPointerCapture(e.pointerId);
+      const rect = cmpWrap.getBoundingClientRect();
+      setCmpPos(((e.clientX - rect.left) / rect.width) * 100);
+    };
+    cmpWrap.onpointermove = (e) => {
+      if (!cmpDragging) return;
+      const rect = cmpWrap.getBoundingClientRect();
+      setCmpPos(((e.clientX - rect.left) / rect.width) * 100);
+    };
+    cmpWrap.onpointerup = () => cmpDragging = false;
+    cmpWrap.onpointercancel = () => cmpDragging = false;
+
+    // Full processing
+    btnProcess.onclick = async () => {
+      try {
+        btnProcess.disabled = true;
+        btnPreview.disabled = true;
+        progressWrap.classList.add('active');
+        resultBox.classList.remove('active');
+
+        const payload = {
+          filename: state.filename,
+          roi: state.roi,
+          padding: parseInt(rngPadding.value),
+          radius: parseInt(rngRadius.value),
+          method: selMethod.value,
+          crf: parseInt(rngCrf.value),
+        };
+
+        const res = await fetch('/api/process', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.error) throw new Error(data.error);
+
+        state.jobId = data.job_id;
+        pollProgress();
+
+      } catch (err) {
+        alert("Processing error: " + err.message);
+        btnProcess.disabled = false;
+        btnPreview.disabled = false;
+      }
+    };
+
+    async function pollProgress() {
+      if (!state.jobId) return;
+      try {
+        const res = await fetch(`/api/progress?job_id=${state.jobId}`);
+        const job = await res.json();
+        if (job.error) throw new Error(job.error);
+
+        const pct = Math.round(job.percent || 0);
+        progressFill.style.width = pct + '%';
+        txtProgressPct.textContent = pct + '%';
+        txtProgressFrames.textContent = `${job.processed_frames} / ${job.total_frames} frames`;
+        txtProgressFps.textContent = job.fps ? `${job.fps.toFixed(1)} FPS` : '-- FPS';
+        txtProgressEta.textContent = job.eta ? `ETA: ${job.eta}s` : 'ETA: --';
+
+        if (job.status === 'completed') {
+          progressWrap.classList.remove('active');
+          btnProcess.disabled = false;
+          btnPreview.disabled = false;
+
+          const s = job.stats;
+          statRes.textContent = `${s.input_resolution} -> ${s.output_resolution}`;
+          statFps.textContent = `${s.input_fps} -> ${s.output_fps} FPS`;
+          statDur.textContent = `${s.duration}s (${s.total_time}s elapsed)`;
+          statSpeed.textContent = `${s.processing_fps} FPS`;
+          statMae.textContent = s.diagnostic_mae != null ? s.diagnostic_mae : '--';
+          statPsnr.textContent = s.diagnostic_psnr != null ? `${s.diagnostic_psnr} dB` : '--';
+
+          btnDownload.href = s.download_url;
+          resultBox.classList.add('active');
+          resultBox.scrollIntoView({ behavior: 'smooth' });
+
+        } else if (job.status === 'failed') {
+          alert("Job failed: " + job.error);
+          progressWrap.classList.remove('active');
+          btnProcess.disabled = false;
+          btnPreview.disabled = false;
+        } else {
+          setTimeout(pollProgress, 500);
+        }
+      } catch (err) {
+        console.error("Progress error:", err);
+        setTimeout(pollProgress, 1000);
+      }
+    }
+  </script>
+</body>
+</html>

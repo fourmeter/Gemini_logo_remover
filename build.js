@@ -222,13 +222,12 @@ async function serveStaticDevDist(rootDir = 'dist', defaultPort = 4173) {
       res.end('Bad Request');
       return;
     }
-    // In dev mode, expose the internal single-image debug harness at `/`
-    // instead of the public landing entry. The landing page still ships to
-    // `dist/index.html` for prod deploys and can be reached at `/index.html`.
-    const devHarnessPath = '/dev-preview.html';
+    const defaultEntry = existsSync(join(distRoot, 'video-preview.html'))
+      ? '/video-preview.html'
+      : (existsSync(join(distRoot, 'index.html')) ? '/index.html' : '/dev-preview.html');
     const requestPath =
       urlPath === '/' || urlPath === ''
-        ? devHarnessPath
+        ? defaultEntry
         : urlPath;
     const fsPath = resolve(join(distRoot, normalize(requestPath)));
 
@@ -245,7 +244,15 @@ async function serveStaticDevDist(rootDir = 'dist', defaultPort = 4173) {
     const targetIsDir = targetExists && statSync(targetPath).isDirectory();
 
     if ((!targetExists || targetIsDir) && isSpaRoute) {
-      targetPath = resolve(join(distRoot, 'dev-preview.html'));
+      if (existsSync(targetPath + '.html')) {
+        targetPath = targetPath + '.html';
+      } else if (existsSync(join(distRoot, 'video-preview.html'))) {
+        targetPath = resolve(join(distRoot, 'video-preview.html'));
+      } else if (existsSync(join(distRoot, 'index.html'))) {
+        targetPath = resolve(join(distRoot, 'index.html'));
+      } else {
+        targetPath = resolve(join(distRoot, 'dev-preview.html'));
+      }
     }
 
     if (!existsSync(targetPath)) {
@@ -388,7 +395,14 @@ mkdirSync('dist/userscript', { recursive: true });
 mkdirSync('dist/workers', { recursive: true });
 mkdirSync(join(EXTENSION_DIR, 'assets'), { recursive: true });
 writeExtensionManifest();
-copyExtensionStaticAssets();
+  try {
+    cpSync('public', 'dist', { recursive: true });
+    // Remove unused JSEP wasm binary (25.02 MiB) to satisfy Cloudflare Pages 25 MiB file size limit
+    rmSync('dist/onnxruntime/ort-wasm-simd-threaded.jsep.wasm', { force: true });
+    rmSync('dist/onnxruntime/ort-wasm-simd-threaded.jsep.mjs', { force: true });
+  } catch (e) {
+    // ignore
+  }
 
 if (isProd) {
   await Promise.all([
@@ -401,14 +415,6 @@ if (isProd) {
   ].filter(Boolean));
   writeExtensionManifest();
   copyExtensionStaticAssets();
-  try {
-    cpSync('public', 'dist', { recursive: true });
-    // Remove unused JSEP wasm binary (25.02 MiB) to satisfy Cloudflare Pages 25 MiB file size limit
-    rmSync('dist/onnxruntime/ort-wasm-simd-threaded.jsep.wasm', { force: true });
-    rmSync('dist/onnxruntime/ort-wasm-simd-threaded.jsep.mjs', { force: true });
-  } catch (e) {
-    // ignore
-  }
   console.log('✅ Build complete!');
   process.exit(0);
 } else {
